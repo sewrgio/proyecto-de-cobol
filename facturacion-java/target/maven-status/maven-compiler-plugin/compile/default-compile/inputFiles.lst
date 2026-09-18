@@ -1,5 +1,6 @@
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/App.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/domain/enums/TipoContribuyente.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/domain/enums/UnidadMedida.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/domain/model/Cliente.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/domain/model/Contacto.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/domain/model/Direccion.java
@@ -8,6 +9,7 @@
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/CobolSimulator.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/service/ClienteService.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/service/FacturacionService.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/service/ProductoService.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/ui/VentanaPrincipal.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/ui/panel/PanelCliente.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/ui/panel/PanelFacturacion.java

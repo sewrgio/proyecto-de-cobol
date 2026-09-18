@@ -1,10 +1,14 @@
 package magno.com.ve.facturacion.ui.panel;
 
+import magno.com.ve.facturacion.domain.enums.UnidadMedida;
 import magno.com.ve.facturacion.domain.model.Cliente;
 import magno.com.ve.facturacion.domain.model.Contacto;
 import magno.com.ve.facturacion.domain.model.Direccion;
 import magno.com.ve.facturacion.domain.model.Producto;
+import magno.com.ve.facturacion.exception.ValidacionException;
 import magno.com.ve.facturacion.service.FacturacionService;
+import magno.com.ve.facturacion.service.ProductoService;
+import magno.com.ve.facturacion.util.Validaciones;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,27 +18,42 @@ import java.util.List;
 
 public class PanelFacturacion extends JPanel {
 
+    // Datos del cliente
     private JTextField txtCedula;
     private JTextField txtNombres;
     private JTextField txtApellidos;
     private JTextField txtDireccion;
     private JTextField txtTelefono;
 
-    private JTextField txtIdProducto;
+    // Datos del producto
+    private JTextField txtCodigo;
+    private JTextField txtCodigoFabricacion;
     private JTextField txtNombreProducto;
+    private JTextField txtDescripcion;
+    private JTextField txtCompaniaFabricacion;   // NUEVO
+    private JComboBox<String> cmbPaisOrigen;      // NUEVO
+    private JTextField txtPeso;
+    private JComboBox<UnidadMedida> cmbUnidadPeso;
+    private JTextField txtAltura;
+    private JTextField txtAnchura;
+    private JTextField txtGrosor;
+    private JComboBox<UnidadMedida> cmbUnidadDimension;
     private JTextField txtPrecio;
     private JTextField txtCantidad;
 
+    // Tabla y log
     private JTable tablaCarrito;
     private DefaultTableModel modeloTabla;
     private JTextArea areaLog;
 
     private List<Producto> carrito;
     private FacturacionService servicio;
+    private ProductoService productoService;
 
     public PanelFacturacion() {
         carrito = new ArrayList<>();
         servicio = new FacturacionService();
+        productoService = new ProductoService();
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -46,9 +65,14 @@ public class PanelFacturacion extends JPanel {
     private JPanel crearPanelSuperior() {
         JPanel panelExterior = new JPanel(new BorderLayout(5, 5));
         panelExterior.setBorder(BorderFactory.createTitledBorder("Datos del Cliente y Producto"));
+        panelExterior.add(crearPanelCliente(), BorderLayout.NORTH);
+        panelExterior.add(crearPanelProducto(), BorderLayout.CENTER);
+        return panelExterior;
+    }
 
+    private JPanel crearPanelCliente() {
         JPanel panelCliente = new JPanel(new GridBagLayout());
-        panelCliente.setBorder(BorderFactory.createTitledBorder("Cliente"));
+        panelCliente.setBorder(BorderFactory.createTitledBorder("Cliente (Rápido)"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(3, 5, 3, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -83,46 +107,120 @@ public class PanelFacturacion extends JPanel {
         txtDireccion = new JTextField(40);
         panelCliente.add(txtDireccion, gbc);
 
-        JPanel panelProducto = new JPanel(new GridBagLayout());
-        panelProducto.setBorder(BorderFactory.createTitledBorder("Producto"));
-        GridBagConstraints gbcP = new GridBagConstraints();
-        gbcP.insets = new Insets(3, 5, 3, 5);
-        gbcP.fill = GridBagConstraints.HORIZONTAL;
+        return panelCliente;
+    }
 
-        gbcP.gridx = 0; gbcP.gridy = 0;
-        panelProducto.add(new JLabel("ID:"), gbcP);
-        gbcP.gridx = 1;
-        txtIdProducto = new JTextField(10);
-        panelProducto.add(txtIdProducto, gbcP);
+    private JPanel crearPanelProducto() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Producto"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(3, 5, 3, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbcP.gridx = 2;
-        panelProducto.add(new JLabel("Nombre:"), gbcP);
-        gbcP.gridx = 3;
-        txtNombreProducto = new JTextField(15);
-        panelProducto.add(txtNombreProducto, gbcP);
+        // Fila 0: Código y código de fabricación
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        panel.add(new JLabel("Código (12 dígitos): *"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        txtCodigo = new JTextField(15);
+        txtCodigo.setToolTipText("Ej: 123456789012");
+        panel.add(txtCodigo, gbc);
 
-        gbcP.gridx = 0; gbcP.gridy = 1;
-        panelProducto.add(new JLabel("Precio ($):"), gbcP);
-        gbcP.gridx = 1;
+        gbc.gridx = 2; gbc.weightx = 0;
+        panel.add(new JLabel("Cód. Fabricación: *"), gbc);
+        gbc.gridx = 3; gbc.weightx = 1;
+        txtCodigoFabricacion = new JTextField(15);
+        txtCodigoFabricacion.setToolTipText("Ej: FAB-2024-A001");
+        panel.add(txtCodigoFabricacion, gbc);
+
+        // Fila 1: Nombre
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        panel.add(new JLabel("Nombre: *"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1; gbc.gridwidth = 3;
+        txtNombreProducto = new JTextField(40);
+        panel.add(txtNombreProducto, gbc);
+
+        // Fila 2: Descripción
+        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0; gbc.gridwidth = 1;
+        panel.add(new JLabel("Descripción:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1; gbc.gridwidth = 3;
+        txtDescripcion = new JTextField(40);
+        panel.add(txtDescripcion, gbc);
+
+        // Fila 3: Compañía y país de origen (NUEVO)
+        gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0; gbc.gridwidth = 1;
+        panel.add(new JLabel("Compañía fabricación: *"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        txtCompaniaFabricacion = new JTextField(20);
+        txtCompaniaFabricacion.setToolTipText("Ej: Samsung Electronics Co.");
+        panel.add(txtCompaniaFabricacion, gbc);
+
+        gbc.gridx = 2; gbc.weightx = 0;
+        panel.add(new JLabel("País origen: *"), gbc);
+        gbc.gridx = 3; gbc.weightx = 1;
+        cmbPaisOrigen = new JComboBox<>(Validaciones.getPaisesValidos());
+        cmbPaisOrigen.setSelectedItem("Venezuela");
+        panel.add(cmbPaisOrigen, gbc);
+
+        // Fila 4: Peso + unidad
+        gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0;
+        panel.add(new JLabel("Peso:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        txtPeso = new JTextField(10);
+        panel.add(txtPeso, gbc);
+
+        gbc.gridx = 2; gbc.weightx = 0;
+        panel.add(new JLabel("Unidad peso:"), gbc);
+        gbc.gridx = 3; gbc.weightx = 1;
+        cmbUnidadPeso = new JComboBox<>(UnidadMedida.values());
+        cmbUnidadPeso.setSelectedItem(UnidadMedida.KILOGRAMO);
+        panel.add(cmbUnidadPeso, gbc);
+
+        // Fila 5: Dimensiones
+        gbc.gridx = 0; gbc.gridy = 5; gbc.weightx = 0;
+        panel.add(new JLabel("Altura:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 0.5;
+        txtAltura = new JTextField(8);
+        panel.add(txtAltura, gbc);
+
+        gbc.gridx = 2; gbc.weightx = 0;
+        panel.add(new JLabel("Anchura:"), gbc);
+        gbc.gridx = 3; gbc.weightx = 0.5;
+        txtAnchura = new JTextField(8);
+        panel.add(txtAnchura, gbc);
+
+        gbc.gridx = 4; gbc.weightx = 0;
+        panel.add(new JLabel("Grosor:"), gbc);
+        gbc.gridx = 5; gbc.weightx = 0.5;
+        txtGrosor = new JTextField(8);
+        panel.add(txtGrosor, gbc);
+
+        gbc.gridx = 6; gbc.weightx = 0;
+        panel.add(new JLabel("Unidad:"), gbc);
+        gbc.gridx = 7; gbc.weightx = 1;
+        cmbUnidadDimension = new JComboBox<>(UnidadMedida.values());
+        cmbUnidadDimension.setSelectedItem(UnidadMedida.CENTIMETRO);
+        panel.add(cmbUnidadDimension, gbc);
+
+        // Fila 6: Precio y cantidad
+        gbc.gridx = 0; gbc.gridy = 6; gbc.weightx = 0;
+        panel.add(new JLabel("Precio ($): *"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
         txtPrecio = new JTextField(10);
-        panelProducto.add(txtPrecio, gbcP);
+        panel.add(txtPrecio, gbc);
 
-        gbcP.gridx = 2;
-        panelProducto.add(new JLabel("Cantidad:"), gbcP);
-        gbcP.gridx = 3;
+        gbc.gridx = 2; gbc.weightx = 0;
+        panel.add(new JLabel("Cantidad: *"), gbc);
+        gbc.gridx = 3; gbc.weightx = 1;
         txtCantidad = new JTextField(5);
-        panelProducto.add(txtCantidad, gbcP);
+        panel.add(txtCantidad, gbc);
 
-        panelExterior.add(panelCliente, BorderLayout.NORTH);
-        panelExterior.add(panelProducto, BorderLayout.CENTER);
-
-        return panelExterior;
+        return panel;
     }
 
     private JPanel crearPanelCentral() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
 
-        String[] columnas = {"ID", "Producto", "Precio", "Cantidad", "Subtotal"};
+        String[] columnas = {"Código", "Producto", "Fabricante", "Origen", "Peso", "Dimensiones", "Precio", "Cant.", "Subtotal"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -163,36 +261,70 @@ public class PanelFacturacion extends JPanel {
 
     private void agregarProducto() {
         try {
-            String id = txtIdProducto.getText().trim();
-            String nombre = txtNombreProducto.getText().trim();
-            double precio = Double.parseDouble(txtPrecio.getText().trim());
-            int cantidad = Integer.parseInt(txtCantidad.getText().trim());
+            Producto producto = construirProductoDesdeFormulario();
+            productoService.validar(producto);
 
-            if (id.isEmpty() || nombre.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Complete los campos del producto.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            Producto p = new Producto(id, nombre, precio, cantidad);
-            carrito.add(p);
+            carrito.add(producto);
             modeloTabla.addRow(new Object[]{
-                p.getId(), p.getNombre(),
-                String.format("%.2f", p.getPrecio()),
-                p.getCantidad(),
-                String.format("%.2f", p.getSubtotal())
+                producto.getCodigo(),
+                producto.getNombre(),
+                producto.getCompaniaFabricacion(),
+                producto.getPaisOrigen(),
+                producto.getPesoFormateado(),
+                producto.getDimensionesFormateadas(),
+                String.format("%.2f", producto.getPrecio()),
+                producto.getCantidad(),
+                String.format("%.2f", producto.getSubtotal())
             });
 
-            txtIdProducto.setText("");
-            txtNombreProducto.setText("");
-            txtPrecio.setText("");
-            txtCantidad.setText("");
-            txtIdProducto.requestFocus();
+            limpiarCamposProducto();
 
+        } catch (ValidacionException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                "Errores de Validación", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Precio y Cantidad deben ser numéricos.",
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                "Verifique que los campos numéricos sean válidos.",
+                "Error de Formato", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private Producto construirProductoDesdeFormulario() throws NumberFormatException {
+        Producto p = new Producto();
+        p.setCodigo(txtCodigo.getText().trim());
+        p.setCodigoFabricacion(txtCodigoFabricacion.getText().trim().toUpperCase());
+        p.setNombre(txtNombreProducto.getText().trim());
+        p.setDescripcion(txtDescripcion.getText().trim());
+        p.setCompaniaFabricacion(txtCompaniaFabricacion.getText().trim());
+        p.setPaisOrigen((String) cmbPaisOrigen.getSelectedItem());
+
+        p.setPeso(parseDouble(txtPeso.getText()));
+        p.setUnidadPeso((UnidadMedida) cmbUnidadPeso.getSelectedItem());
+
+        p.setAltura(parseDouble(txtAltura.getText()));
+        p.setAnchura(parseDouble(txtAnchura.getText()));
+        p.setGrosor(parseDouble(txtGrosor.getText()));
+        p.setUnidadDimension((UnidadMedida) cmbUnidadDimension.getSelectedItem());
+
+        p.setPrecio(parseDoubleObligatorio(txtPrecio.getText()));
+        p.setCantidad(parseIntObligatorio(txtCantidad.getText()));
+
+        return p;
+    }
+
+    private Double parseDouble(String texto) {
+        if (texto == null || texto.trim().isEmpty()) return null;
+        return Double.parseDouble(texto.trim().replace(",", "."));
+    }
+
+    private double parseDoubleObligatorio(String texto) {
+        if (texto == null || texto.trim().isEmpty()) return 0;
+        return Double.parseDouble(texto.trim().replace(",", "."));
+    }
+
+    private int parseIntObligatorio(String texto) {
+        if (texto == null || texto.trim().isEmpty()) return 0;
+        return Integer.parseInt(texto.trim());
     }
 
     private void facturar() {
@@ -225,6 +357,24 @@ public class PanelFacturacion extends JPanel {
         areaLog.setText(resultado);
     }
 
+    private void limpiarCamposProducto() {
+        txtCodigo.setText("");
+        txtCodigoFabricacion.setText("");
+        txtNombreProducto.setText("");
+        txtDescripcion.setText("");
+        txtCompaniaFabricacion.setText("");
+        cmbPaisOrigen.setSelectedItem("Venezuela");
+        txtPeso.setText("");
+        txtAltura.setText("");
+        txtAnchura.setText("");
+        txtGrosor.setText("");
+        txtPrecio.setText("");
+        txtCantidad.setText("");
+        cmbUnidadPeso.setSelectedItem(UnidadMedida.KILOGRAMO);
+        cmbUnidadDimension.setSelectedItem(UnidadMedida.CENTIMETRO);
+        txtCodigo.requestFocus();
+    }
+
     private void limpiarTodo() {
         carrito.clear();
         modeloTabla.setRowCount(0);
@@ -234,9 +384,6 @@ public class PanelFacturacion extends JPanel {
         txtApellidos.setText("");
         txtDireccion.setText("");
         txtTelefono.setText("");
-        txtIdProducto.setText("");
-        txtNombreProducto.setText("");
-        txtPrecio.setText("");
-        txtCantidad.setText("");
+        limpiarCamposProducto();
     }
 }

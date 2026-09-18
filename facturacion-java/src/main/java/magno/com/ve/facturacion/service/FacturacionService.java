@@ -14,8 +14,8 @@ public class FacturacionService {
         log.append("--- Iniciando Facturación ---\n");
 
         for (Producto p : items) {
-            log.append("[SIMULADOR COBOL] Verificando stock: ").append(p.getId()).append("\n");
-            if (!cobol.verificarStock(p.getId(), p.getCantidad())) {
+            log.append("[SIMULADOR COBOL] Verificando stock: ").append(p.getCodigo()).append("\n");
+            if (!cobol.verificarStock(p.getCodigo(), p.getCantidad())) {
                 log.append("❌ ERROR: Sin stock para ").append(p.getNombre()).append("\n");
                 return log.toString();
             }

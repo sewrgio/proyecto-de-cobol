@@ -5,8 +5,8 @@ import java.util.List;
 
 public class CobolSimulator {
 
-    public boolean verificarStock(String idProducto, int cantidad) {
-        if (idProducto.equalsIgnoreCase("P999")) {
+    public boolean verificarStock(String codigoProducto, int cantidad) {
+        if (codigoProducto.equalsIgnoreCase("999999999999")) {
             return false;
         }
         return true;
