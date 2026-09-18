@@ -39,7 +39,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <mainClass>magno.com.ve.App</mainClass>
+                    <mainClass>magno.com.ve.facturacion.App</mainClass>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,4 +1,4 @@
-package magno.com.ve.model;
+package magno.com.ve.facturacion.domain.model;
 
 public class Producto {
     private String id;
@@ -18,7 +18,6 @@ public class Producto {
     public double getPrecio() { return precio; }
     public int getCantidad() { return cantidad; }
 
-    // ⚠️ ESTE ES EL MÉTODO QUE FALTA ⚠️
     public double getSubtotal() {
         return precio * cantidad;
     }
