@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="magno.com.ve.facturacion.ui.controller.DialogoClienteController"
+            styleClass="dialog-root">
+
+    <!-- ============================================================
+         ENCABEZADO
+         ============================================================ -->
+    <top>
+        <VBox styleClass="dialog-header">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            <Label text="Registrar Nuevo Cliente" styleClass="section-title"/>
+            <Label text="El cliente no está registrado. Complete los datos para agregarlo."
+                   styleClass="section-subtitle"/>
+        </VBox>
+    </top>
+
+    <!-- ============================================================
+         FORMULARIO
+         ============================================================ -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane" hbarPolicy="NEVER">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+
+            <VBox spacing="16">
+
+                <!-- Identificación -->
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Identificación" styleClass="card-title"/>
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Cédula / RIF *" styleClass="field-label"/>
+                            <TextField fx:id="txtCedula" promptText="Ej: V-12345678" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" prefWidth="200">
+                            <Label text="Tipo detectado" styleClass="field-label"/>
+                            <Label fx:id="lblTipoContribuyente" text="—"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #94A3B8; -fx-padding: 10 0 0 0;"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Nombre -->
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Nombre / Razón Social" styleClass="card-title"/>
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Nombres *" styleClass="field-label"/>
+                            <TextField fx:id="txtNombres" promptText="Ej: Sergio" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Apellidos" styleClass="field-label"/>
+                            <TextField fx:id="txtApellidos" promptText="Ej: Pérez" styleClass="text-field"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Dirección y Contacto -->
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Dirección y Contacto" styleClass="card-title"/>
+
+                    <VBox spacing="6">
+                        <Label text="Dirección *" styleClass="field-label"/>
+                        <TextField fx:id="txtDireccion" promptText="Ej: Av. Bolívar #123, Centro, Caracas" styleClass="text-field"/>
+                    </VBox>
+
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Teléfono principal *" styleClass="field-label"/>
+                            <TextField fx:id="txtTelefonoPrincipal" promptText="0412-1234567" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Email" styleClass="field-label"/>
+                            <TextField fx:id="txtEmail" promptText="cliente@empresa.com" styleClass="text-field"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- ============================================================
+         BOTONES
+         ============================================================ -->
+    <bottom>
+        <HBox styleClass="panel-footer" alignment="CENTER_RIGHT" spacing="12">
+            <padding>
+                <Insets top="15" right="30" bottom="15" left="30"/>
+            </padding>
+            <Button text="Cancelar" styleClass="btn-secondary"
+                    prefWidth="120" prefHeight="42" onAction="#handleCancelar"/>
+            <Button text="Guardar Cliente" styleClass="btn-primary"
+                    prefWidth="180" prefHeight="42" onAction="#handleGuardar"/>
+        </HBox>
+    </bottom>
+</BorderPane>

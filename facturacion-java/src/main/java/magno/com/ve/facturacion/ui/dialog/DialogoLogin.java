@@ -1,5 +1,6 @@
 package magno.com.ve.facturacion.ui.dialog;
 
+import magno.com.ve.facturacion.config.AppConfig;
 import magno.com.ve.facturacion.domain.model.Usuario;
 import magno.com.ve.facturacion.exception.ValidacionException;
 import magno.com.ve.facturacion.service.UsuarioService;
@@ -9,9 +10,11 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
- * Diálogo modal de login.
+ * Diálogo modal de login para MAGNO.
  * Bloquea la aplicación hasta que el usuario se autentique o cancele.
  */
 public class DialogoLogin extends JDialog {
@@ -24,17 +27,23 @@ public class DialogoLogin extends JDialog {
     private final UsuarioService usuarioService;
 
     public DialogoLogin(Frame parent, UsuarioService usuarioService) {
-        super(parent, "Iniciar Sesión", true);
+        super(parent, AppConfig.NOMBRE_SISTEMA + " - Iniciar Sesión", true);
         this.usuarioService = usuarioService;
 
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(420, 300);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                cancelar();
+            }
+        });
+
+        setSize(440, 380);
         setLocationRelativeTo(parent);
         setResizable(false);
 
         add(crearContenido());
 
-        // Al presionar ESC, se cierra como cancelado
         getRootPane().registerKeyboardAction(
             e -> cancelar(),
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -46,22 +55,37 @@ public class DialogoLogin extends JDialog {
         JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
         panelPrincipal.setBorder(new EmptyBorder(20, 30, 20, 30));
 
-        // ===== Encabezado =====
+        // ===== Encabezado con identidad MAGNO =====
         JPanel encabezado = new JPanel();
         encabezado.setLayout(new BoxLayout(encabezado, BoxLayout.Y_AXIS));
 
-        JLabel titulo = new JLabel("Sistema de Facturación");
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        JLabel titulo = new JLabel(AppConfig.NOMBRE_SISTEMA);
+        titulo.setFont(new Font("Arial", Font.BOLD, 36));
+        titulo.setForeground(new Color(0, 80, 160));
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subtitulo = new JLabel("Java + COBOL");
-        subtitulo.setFont(new Font("Arial", Font.ITALIC, 12));
-        subtitulo.setForeground(Color.GRAY);
+        JLabel subtitulo = new JLabel(AppConfig.SLOGAN);
+        subtitulo.setFont(new Font("Arial", Font.PLAIN, 13));
+        subtitulo.setForeground(new Color(100, 100, 100));
         subtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        JLabel descripcion = new JLabel(AppConfig.DESCRIPCION_CORTA);
+        descripcion.setFont(new Font("Arial", Font.ITALIC, 11));
+        descripcion.setForeground(new Color(150, 150, 150));
+        descripcion.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel version = new JLabel("v" + AppConfig.VERSION);
+        version.setFont(new Font("Arial", Font.ITALIC, 10));
+        version.setForeground(Color.GRAY);
+        version.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         encabezado.add(titulo);
-        encabezado.add(Box.createVerticalStrut(5));
+        encabezado.add(Box.createVerticalStrut(3));
         encabezado.add(subtitulo);
+        encabezado.add(Box.createVerticalStrut(2));
+        encabezado.add(descripcion);
+        encabezado.add(Box.createVerticalStrut(5));
+        encabezado.add(version);
 
         // ===== Formulario =====
         JPanel formulario = new JPanel(new GridBagLayout());
@@ -69,7 +93,6 @@ public class DialogoLogin extends JDialog {
         gbc.insets = new Insets(8, 5, 8, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Usuario
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         formulario.add(new JLabel("Usuario:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1;
@@ -77,7 +100,6 @@ public class DialogoLogin extends JDialog {
         txtUsuario.setFont(new Font("Arial", Font.PLAIN, 14));
         formulario.add(txtUsuario, gbc);
 
-        // Contraseña
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         formulario.add(new JLabel("Contraseña:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1;
@@ -85,7 +107,6 @@ public class DialogoLogin extends JDialog {
         txtPassword.setFont(new Font("Arial", Font.PLAIN, 14));
         formulario.add(txtPassword, gbc);
 
-        // Mensaje de error
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
         lblMensaje = new JLabel(" ");
         lblMensaje.setForeground(Color.RED);
@@ -106,12 +127,10 @@ public class DialogoLogin extends JDialog {
         botones.add(btnIngresar);
         botones.add(btnCancelar);
 
-        // ===== Ensamblar =====
         panelPrincipal.add(encabezado, BorderLayout.NORTH);
         panelPrincipal.add(formulario, BorderLayout.CENTER);
         panelPrincipal.add(botones, BorderLayout.SOUTH);
 
-        // Enter en cualquier campo = intentar login
         KeyAdapter enterListener = new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -134,8 +153,7 @@ public class DialogoLogin extends JDialog {
 
             Usuario usuario = usuarioService.autenticar(username, password);
             this.usuarioAutenticado = usuario;
-
-            dispose(); // Cerrar el diálogo
+            dispose();
 
         } catch (ValidacionException ex) {
             lblMensaje.setText("✗ " + ex.getMessage());
@@ -145,20 +163,22 @@ public class DialogoLogin extends JDialog {
     }
 
     private void cancelar() {
-        usuarioAutenticado = null;
-        dispose();
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "¿Está seguro que desea salir de " + AppConfig.NOMBRE_SISTEMA + "?",
+            "Confirmar salida",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            usuarioAutenticado = null;
+            dispose();
+        }
     }
 
-    /**
-     * Devuelve el usuario autenticado, o null si se canceló.
-     */
     public Usuario getUsuarioAutenticado() {
         return usuarioAutenticado;
     }
 
-    /**
-     * Método estático de conveniencia para mostrar el login.
-     */
     public static Usuario mostrar(Frame parent, UsuarioService usuarioService) {
         DialogoLogin dialog = new DialogoLogin(parent, usuarioService);
         dialog.setVisible(true);

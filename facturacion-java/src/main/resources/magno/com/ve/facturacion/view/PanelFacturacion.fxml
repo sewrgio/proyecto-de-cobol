@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="magno.com.ve.facturacion.ui.controller.PanelFacturacionController"
+            styleClass="panel-root">
+
+    <top>
+        <VBox styleClass="panel-header">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            <Label text="Facturación" styleClass="section-title"/>
+            <Label text="Registre la venta y genere la factura" styleClass="section-subtitle"/>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+
+            <VBox spacing="16">
+
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Datos del Cliente" styleClass="card-title"/>
+
+                    <VBox spacing="6">
+                        <Label text="Cédula / RIF *" styleClass="field-label"/>
+                        <TextField fx:id="txtCedula"
+                                   promptText="Escriba la cédula y presione Enter"
+                                   styleClass="text-field"
+                                   onAction="#handleBuscarCliente"/>
+                    </VBox>
+
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Nombre" styleClass="field-label"/>
+                            <Label fx:id="lblNombreCliente" text="— Busque un cliente —"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #0F172A; -fx-padding: 8 0 0 0;"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Teléfono" styleClass="field-label"/>
+                            <Label fx:id="lblTelefonoCliente" text="—"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #0F172A; -fx-padding: 8 0 0 0;"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Dirección" styleClass="field-label"/>
+                            <Label fx:id="lblDireccionCliente" text="—"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #0F172A; -fx-padding: 8 0 0 0;"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="6">
+                        <Label text="Forma de pago" styleClass="field-label"/>
+                        <ComboBox fx:id="cmbFormaPago" styleClass="combo-box" maxWidth="300"/>
+                    </VBox>
+                </VBox>
+
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Agregar Producto" styleClass="card-title"/>
+                    <HBox spacing="15" alignment="BOTTOM_LEFT">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Código del producto" styleClass="field-label"/>
+                            <TextField fx:id="txtCodigoProducto" promptText="Ej: 123456789012" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" prefWidth="120">
+                            <Label text="Cantidad" styleClass="field-label"/>
+                            <TextField fx:id="txtCantidad" promptText="Ej: 1" styleClass="text-field"/>
+                        </VBox>
+                        <Button text="Agregar" styleClass="btn-primary"
+                                prefWidth="120" prefHeight="42"
+                                onAction="#handleAgregarProducto"/>
+                    </HBox>
+                </VBox>
+
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Carrito de Compra" styleClass="card-title"/>
+                    <TableView fx:id="tblCarrito" prefHeight="200">
+                        <columns>
+                            <TableColumn fx:id="colCodigo" text="Código" prefWidth="140"/>
+                            <TableColumn fx:id="colNombre" text="Producto" prefWidth="250"/>
+                            <TableColumn fx:id="colPrecio" text="Precio" prefWidth="100"/>
+                            <TableColumn fx:id="colCantidad" text="Cantidad" prefWidth="90"/>
+                            <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="120"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="El carrito está vacío"/>
+                        </placeholder>
+                    </TableView>
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button text="Quitar seleccionado" styleClass="btn-secondary"
+                                prefHeight="36" onAction="#handleQuitarProducto"/>
+                        <Button text="Limpiar carrito" styleClass="btn-secondary"
+                                prefHeight="36" onAction="#handleLimpiarCarrito"/>
+                    </HBox>
+                </VBox>
+
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Resultado del Core COBOL" styleClass="card-title"/>
+                    <TextArea fx:id="txtLog" prefHeight="180" editable="false"
+                              styleClass="log-area" wrapText="false"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox styleClass="panel-footer" alignment="CENTER_RIGHT" spacing="12">
+            <padding>
+                <Insets top="15" right="30" bottom="15" left="30"/>
+            </padding>
+            <Button text="Cancelar" styleClass="btn-secondary"
+                    prefWidth="120" prefHeight="42" onAction="#handleLimpiarTodo"/>
+            <Button text="Facturar" styleClass="btn-primary"
+                    prefWidth="160" prefHeight="42" onAction="#handleFacturar"/>
+        </HBox>
+    </bottom>
+</BorderPane>

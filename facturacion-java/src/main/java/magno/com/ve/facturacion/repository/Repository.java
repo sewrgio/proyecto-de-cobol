@@ -5,7 +5,6 @@ import java.util.Optional;
 
 /**
  * Interfaz genérica para todos los repositorios del sistema.
- * Define las operaciones CRUD básicas.
  */
 public interface Repository<T, ID> {
 

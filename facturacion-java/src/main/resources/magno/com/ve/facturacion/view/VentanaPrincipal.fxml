@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="magno.com.ve.facturacion.ui.controller.VentanaPrincipalController"
+            prefWidth="1280" prefHeight="850"
+            styleClass="main-root">
+
+    <!-- ============================================================
+         BARRA SUPERIOR
+         ============================================================ -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
+            <padding>
+                <Insets top="0" right="24" bottom="0" left="24"/>
+            </padding>
+
+            <!-- Logo MAGNO -->
+            <Label text="MAGNO" styleClass="top-bar-logo"/>
+
+            <!-- Separador -->
+            <Label text="  │  " styleClass="top-bar-separator"/>
+
+            <!-- Empresa -->
+            <Label fx:id="lblEmpresa" text="Empresa Demo" styleClass="top-bar-empresa"/>
+
+            <!-- Espacio flexible -->
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Usuario -->
+            <Label fx:id="lblUsuario" text="Usuario" styleClass="top-bar-usuario"/>
+
+            <Region prefWidth="12"/>
+
+            <!-- Rol -->
+            <Label fx:id="lblRol" text="Rol" styleClass="top-bar-rol"/>
+
+            <Region prefWidth="16"/>
+
+            <!-- Botón Cerrar sesión -->
+            <Button fx:id="btnCerrarSesion" text="Cerrar sesión"
+                    styleClass="btn-logout"
+                    onAction="#handleCerrarSesion"/>
+        </HBox>
+    </top>
+
+    <!-- ============================================================
+         CENTRO: PESTAÑAS DE MÓDULOS
+         ============================================================ -->
+    <center>
+        <TabPane fx:id="tabPane" styleClass="tab-pane" tabClosingPolicy="UNAVAILABLE">
+            <!-- Las pestañas se agregan dinámicamente desde el controller -->
+        </TabPane>
+    </center>
+
+    <!-- ============================================================
+         BARRA DE ESTADO INFERIOR
+         ============================================================ -->
+    <bottom>
+        <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="0">
+            <padding>
+                <Insets top="6" right="20" bottom="6" left="20"/>
+            </padding>
+
+            <Label fx:id="lblEstado" text="Listo" styleClass="status-text"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label fx:id="lblVersion" text="MAGNO v1.0.0" styleClass="status-text"/>
+        </HBox>
+    </bottom>
+</BorderPane>
