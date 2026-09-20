@@ -6,7 +6,14 @@
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/domain/model/Direccion.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/domain/model/Producto.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/exception/ValidacionException.java
-/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/CobolSimulator.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/CobolConnector.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/CobolConnectorMock.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/CobolConnectorSocket.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/CobolException.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/dto/ClienteDTO.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/dto/FacturaRequestDTO.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/dto/FacturaResponseDTO.java
+/home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/integration/cobol/dto/ItemDTO.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/service/ClienteService.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/service/FacturacionService.java
 /home/sergio/Documentos/proyecto-de-cobol/facturacion-java/src/main/java/magno/com/ve/facturacion/service/ProductoService.java
