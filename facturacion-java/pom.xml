@@ -11,23 +11,19 @@
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!-- Versión de JavaFX -->
         <javafx.version>21.0.5</javafx.version>
-
-        <!-- Plugin de JavaFX -->
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
     </properties>
 
     <dependencies>
-        <!-- ===== JSON (para comunicación con COBOL) ===== -->
+        <!-- JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.17.0</version>
         </dependency>
 
-        <!-- ===== JUnit (pruebas) ===== -->
+        <!-- JUnit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -35,7 +31,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- ===== JavaFX (Controles, FXML, Gráficos) ===== -->
+        <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -56,11 +52,27 @@
             <artifactId>javafx-base</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
+        <!-- iText 7 para generar PDFs -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>kernel</artifactId>
+            <version>8.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>8.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+            <version>8.0.2</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- ===== Compilador Java 21 ===== -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -69,8 +81,6 @@
                     <release>21</release>
                 </configuration>
             </plugin>
-
-            <!-- ===== Plugin de JavaFX (para mvn javafx:run) ===== -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>

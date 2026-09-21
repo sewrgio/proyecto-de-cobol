@@ -1,0 +1,359 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROC-FACTURA-JSON.
+       
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT ARCHIVO-ENTRADA ASSIGN TO "factura-input.json"
+               ORGANIZATION IS LINE SEQUENTIAL
+               FILE STATUS IS WS-STATUS-IN.
+           SELECT ARCHIVO-SALIDA  ASSIGN TO "factura-output.json"
+               ORGANIZATION IS LINE SEQUENTIAL
+               FILE STATUS IS WS-STATUS-OUT.
+       
+       DATA DIVISION.
+       FILE SECTION.
+       FD  ARCHIVO-ENTRADA.
+       01  REG-ENTRADA           PIC X(300).
+       FD  ARCHIVO-SALIDA.
+       01  REG-SALIDA            PIC X(300).
+       
+       WORKING-STORAGE SECTION.
+       COPY "FAC-ENCABEZADO.cpy".
+       COPY "FAC-RENGLON.cpy".
+       COPY "FISCAL-SENIAT.cpy".
+       COPY "EMPRESA.cpy".
+       COPY "CAJERO.cpy".
+       COPY "PAGO.cpy".
+       
+       01  WS-STATUS-IN          PIC X(02).
+       01  WS-STATUS-OUT         PIC X(02).
+       01  WS-FIN-ARCHIVO        PIC X VALUE "N".
+           88 FIN-ARCHIVO        VALUE "S".
+       01  WS-CONTADOR-ITEMS     PIC 9(03) VALUE 0.
+       01  WS-RESPUESTA          PIC 9(02) VALUE 0.
+       01  WS-LINEA-TRIM         PIC X(300).
+       01  WS-VALOR              PIC X(100).
+       01  WS-VALOR-NUM          PIC 9(09)V99.
+       01  WS-VALOR-ENT          PIC 9(05).
+       01  WS-POS-INI            PIC 9(03).
+       01  WS-POS-FIN            PIC 9(03).
+       01  WS-MONTO-TXT          PIC Z(07)9.99.
+       01  WS-ENTERO-TXT         PIC Z(08)9.
+       01  WS-ITEM-ACTUAL        PIC 9(03) VALUE 0.
+       01  WS-LINEA-NUM          PIC 9(05) VALUE 0.
+       
+       PROCEDURE DIVISION.
+       0000-MAIN.
+           PERFORM 1000-INICIALIZAR
+           PERFORM 2000-LEER-ENTRADA
+           DISPLAY "═══════════════════════════════════════"
+           DISPLAY " ESTADO ANTES DE PROCESAR:"
+           DISPLAY "   FAC-COD-CLIENTE: [" FAC-COD-CLIENTE "]"
+           DISPLAY "   FIS-RIF-CLIENTE: [" FIS-RIF-CLIENTE "]"
+           DISPLAY "   FIS-RAZON-SOCIAL: [" FIS-RAZON-SOCIAL "]"
+           DISPLAY "   FAC-FORMA-PAGO: [" FAC-FORMA-PAGO "]"
+           DISPLAY "   FAC-CANT-ITEMS: " FAC-CANT-ITEMS
+           DISPLAY "   ITEM 1 COD: [" REN-COD-PROD(1) "]"
+           DISPLAY "   ITEM 1 CANT: " REN-CANTIDAD(1)
+           DISPLAY "   ITEM 1 PRECIO: " REN-PRECIO-UNIT(1)
+           PERFORM 3000-PROCESAR-FACTURA
+           PERFORM 4000-ESCRIBIR-SALIDA
+           STOP RUN.
+       
+       1000-INICIALIZAR.
+           INITIALIZE FACTURA-CABECERA
+           INITIALIZE FAC-DETALLE
+           INITIALIZE DATOS-FISCALES-SENIAT
+           INITIALIZE EMPRESA-SUCURSAL
+           INITIALIZE CAJERO-INFO
+           INITIALIZE DATOS-PAGO
+           MOVE 0 TO WS-CONTADOR-ITEMS WS-ITEM-ACTUAL WS-LINEA-NUM
+           MOVE "N" TO WS-FIN-ARCHIVO.
+       
+       2000-LEER-ENTRADA.
+           OPEN INPUT ARCHIVO-ENTRADA
+           PERFORM UNTIL FIN-ARCHIVO
+               READ ARCHIVO-ENTRADA
+                   AT END MOVE "S" TO WS-FIN-ARCHIVO
+                   NOT AT END
+                       MOVE REG-ENTRADA TO WS-LINEA-TRIM
+                       PERFORM 2100-PARSEAR-LINEA
+               END-READ
+           END-PERFORM
+           CLOSE ARCHIVO-ENTRADA.
+       
+       *> Estrategia: para cada clave, buscar 'BEFORE INITIAL'.
+       *> Si la posición < 300, la clave existe.
+       *> Luego buscar el VALOR después de la clave.
+       2100-PARSEAR-LINEA.
+           
+           *> ---- rifCliente ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "rifCliente"
+           IF WS-POS-INI < 300
+               PERFORM 2200-EXTRAER-RIF-CLI
+           END-IF
+           
+           *> ---- razonSocial ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "razonSocial"
+           IF WS-POS-INI < 300
+               PERFORM 2210-EXTRAER-RAZON
+           END-IF
+           
+           *> ---- formaPago ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "formaPago"
+           IF WS-POS-INI < 300
+               PERFORM 2220-EXTRAER-FORMA-PAGO
+           END-IF
+           
+           *> ---- fechaEmision ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "fechaEmision"
+           IF WS-POS-INI < 300
+               PERFORM 2230-EXTRAER-FECHA
+           END-IF
+           
+           *> ---- horaEmision ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "horaEmision"
+           IF WS-POS-INI < 300
+               PERFORM 2240-EXTRAER-HORA
+           END-IF
+           
+           *> ---- montoPagado ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "montoPagado"
+           IF WS-POS-INI < 300
+               PERFORM 2250-EXTRAER-MONTO-PAGADO
+           END-IF
+           
+           *> ---- codigoItem (contador) ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "codigoItem"
+           IF WS-POS-INI < 300
+               ADD 1 TO WS-CONTADOR-ITEMS
+               MOVE WS-CONTADOR-ITEMS TO WS-ITEM-ACTUAL
+               PERFORM 2300-EXTRAER-COD-ITEM
+           END-IF
+           
+           *> ---- nombreItem ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "nombreItem"
+           IF WS-POS-INI < 300
+               PERFORM 2310-EXTRAER-NOM-ITEM
+           END-IF
+           
+           *> ---- cantidadItem ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "cantidadItem"
+           IF WS-POS-INI < 300
+               PERFORM 2320-EXTRAER-CANT
+           END-IF
+           
+           *> ---- precioItem ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "precioItem"
+           IF WS-POS-INI < 300
+               PERFORM 2330-EXTRAER-PRECIO
+           END-IF
+           
+           *> ---- alicuotaItem ----
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL "alicuotaItem"
+           IF WS-POS-INI < 300
+               PERFORM 2340-EXTRAER-ALICUOTA
+           END-IF.
+       
+       *> Extrae el valor entre la PRIMERA y SEGUNDA comilla
+       *> a partir de WS-POS-INI (que apunta al inicio de la clave)
+       8200-EXTRAER-VALOR.
+           MOVE SPACES TO WS-VALOR
+           
+           *> Buscar la primera comilla desde WS-POS-INI
+           MOVE 0 TO WS-POS-FIN
+           INSPECT WS-LINEA-TRIM(WS-POS-INI:200) TALLYING WS-POS-FIN
+               FOR CHARACTERS BEFORE INITIAL '"'
+           IF WS-POS-FIN >= 200
+               EXIT PARAGRAPH
+           END-IF
+           
+           *> Avanzar a la posición después de la primera comilla
+           ADD WS-POS-INI TO WS-POS-FIN
+           ADD 1 TO WS-POS-FIN
+           
+           *> Buscar la segunda comilla
+           MOVE 0 TO WS-POS-INI
+           INSPECT WS-LINEA-TRIM(WS-POS-FIN:100) TALLYING WS-POS-INI
+               FOR CHARACTERS BEFORE INITIAL '"'
+           
+           *> Extraer el valor
+           IF WS-POS-INI > 0
+               MOVE WS-LINEA-TRIM(WS-POS-FIN:WS-POS-INI) TO WS-VALOR
+           END-IF.
+       
+       2200-EXTRAER-RIF-CLI.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES
+               MOVE WS-VALOR(1:12) TO FIS-RIF-CLIENTE
+               MOVE WS-VALOR(1:10) TO FAC-COD-CLIENTE
+               DISPLAY "   ✓ RIF Cliente: [" WS-VALOR(1:12) "]"
+           END-IF.
+       
+       2210-EXTRAER-RAZON.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES
+               MOVE WS-VALOR(1:40) TO FIS-RAZON-SOCIAL
+               DISPLAY "   ✓ Razon Social: [" WS-VALOR(1:40) "]"
+           END-IF.
+       
+       2220-EXTRAER-FORMA-PAGO.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES
+               MOVE WS-VALOR(1:2) TO FAC-FORMA-PAGO
+               DISPLAY "   ✓ Forma Pago: [" WS-VALOR(1:2) "]"
+           END-IF.
+       
+       2230-EXTRAER-FECHA.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES
+               MOVE FUNCTION NUMVAL(WS-VALOR) TO FAC-FECHA-EMISION
+           END-IF.
+       
+       2240-EXTRAER-HORA.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES
+               MOVE FUNCTION NUMVAL(WS-VALOR) TO FAC-HORA-EMISION
+           END-IF.
+       
+       2250-EXTRAER-MONTO-PAGADO.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES
+               COMPUTE PAG-MONTO-PAGADO = FUNCTION NUMVAL(WS-VALOR)
+           END-IF.
+       
+       2300-EXTRAER-COD-ITEM.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES AND WS-ITEM-ACTUAL <= 10
+               MOVE WS-VALOR(1:10) TO REN-COD-PROD(WS-ITEM-ACTUAL)
+               DISPLAY "   ✓ Item " WS-ITEM-ACTUAL " cod: [" WS-VALOR(1:10) "]"
+           END-IF.
+       
+       2310-EXTRAER-NOM-ITEM.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES AND WS-ITEM-ACTUAL <= 10
+               MOVE WS-VALOR(1:40) TO REN-NOMBRE-PROD(WS-ITEM-ACTUAL)
+           END-IF.
+       
+       2320-EXTRAER-CANT.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES 
+              AND WS-ITEM-ACTUAL >= 1 AND WS-ITEM-ACTUAL <= 10
+               COMPUTE WS-VALOR-ENT = FUNCTION NUMVAL(WS-VALOR)
+               MOVE WS-VALOR-ENT TO REN-CANTIDAD(WS-ITEM-ACTUAL)
+           END-IF.
+       
+       2330-EXTRAER-PRECIO.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES 
+              AND WS-ITEM-ACTUAL >= 1 AND WS-ITEM-ACTUAL <= 10
+               COMPUTE WS-VALOR-NUM = FUNCTION NUMVAL(WS-VALOR)
+               MOVE WS-VALOR-NUM TO REN-PRECIO-UNIT(WS-ITEM-ACTUAL)
+           END-IF.
+       
+       2340-EXTRAER-ALICUOTA.
+           PERFORM 8200-EXTRAER-VALOR
+           IF WS-VALOR NOT = SPACES 
+              AND WS-ITEM-ACTUAL >= 1 AND WS-ITEM-ACTUAL <= 10
+               MOVE WS-VALOR(1:1) TO REN-ALICUOTA(WS-ITEM-ACTUAL)
+           END-IF.
+       
+       3000-PROCESAR-FACTURA.
+           MOVE WS-CONTADOR-ITEMS TO FAC-CANT-ITEMS
+           CALL "PROC-FACTURA" USING FACTURA-CABECERA
+                                    FAC-DETALLE
+                                    DATOS-FISCALES-SENIAT
+                                    WS-RESPUESTA.
+       
+       4000-ESCRIBIR-SALIDA.
+           OPEN OUTPUT ARCHIVO-SALIDA
+           MOVE "{" TO REG-SALIDA
+           WRITE REG-SALIDA
+           IF WS-RESPUESTA = 0
+               MOVE '  "estado": "OK",' TO REG-SALIDA
+               WRITE REG-SALIDA
+               MOVE '  "codigoError": 0,' TO REG-SALIDA
+               WRITE REG-SALIDA
+               STRING '  "numeroControl": "' DELIMITED BY SIZE
+                      FIS-NUM-CONTROL DELIMITED BY SIZE
+                      '",' DELIMITED BY SIZE
+                      INTO REG-SALIDA
+               END-STRING
+               WRITE REG-SALIDA
+               MOVE FAC-NUMERO TO WS-ENTERO-TXT
+               STRING '  "numeroFactura": ' DELIMITED BY SIZE
+                      WS-ENTERO-TXT DELIMITED BY SIZE
+                      ',' DELIMITED BY SIZE
+                      INTO REG-SALIDA
+               END-STRING
+               WRITE REG-SALIDA
+               MOVE FIS-BASE-IMP-GEN TO WS-MONTO-TXT
+               STRING '  "baseImponible": ' DELIMITED BY SIZE
+                      WS-MONTO-TXT DELIMITED BY SIZE
+                      ',' DELIMITED BY SIZE
+                      INTO REG-SALIDA
+               END-STRING
+               WRITE REG-SALIDA
+               MOVE FIS-BASE-EXENTO TO WS-MONTO-TXT
+               STRING '  "baseExento": ' DELIMITED BY SIZE
+                      WS-MONTO-TXT DELIMITED BY SIZE
+                      ',' DELIMITED BY SIZE
+                      INTO REG-SALIDA
+               END-STRING
+               WRITE REG-SALIDA
+               MOVE FIS-MONTO-IVA-GEN TO WS-MONTO-TXT
+               STRING '  "iva": ' DELIMITED BY SIZE
+                      WS-MONTO-TXT DELIMITED BY SIZE
+                      ',' DELIMITED BY SIZE
+                      INTO REG-SALIDA
+               END-STRING
+               WRITE REG-SALIDA
+               MOVE FIS-MONTO-IGTF TO WS-MONTO-TXT
+               STRING '  "igtf": ' DELIMITED BY SIZE
+                      WS-MONTO-TXT DELIMITED BY SIZE
+                      ',' DELIMITED BY SIZE
+                      INTO REG-SALIDA
+               END-STRING
+               WRITE REG-SALIDA
+               MOVE FAC-TOTAL-NETO TO WS-MONTO-TXT
+               STRING '  "total": ' DELIMITED BY SIZE
+                      WS-MONTO-TXT DELIMITED BY SIZE
+                      INTO REG-SALIDA
+               END-STRING
+               WRITE REG-SALIDA
+           ELSE
+               MOVE '  "estado": "ERROR",' TO REG-SALIDA
+               WRITE REG-SALIDA
+               MOVE WS-RESPUESTA TO WS-ENTERO-TXT
+               STRING '  "codigoError": ' DELIMITED BY SIZE
+                      WS-ENTERO-TXT DELIMITED BY SIZE
+                      INTO REG-SALIDA
+               END-STRING
+               WRITE REG-SALIDA
+           END-IF
+           MOVE "}" TO REG-SALIDA
+           WRITE REG-SALIDA
+           CLOSE ARCHIVO-SALIDA.

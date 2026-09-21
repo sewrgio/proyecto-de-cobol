@@ -1,49 +1,81 @@
 package magno.com.ve.facturacion.integration.cobol.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DTO completo de la solicitud de facturación.
- * Este es el JSON que Java envía al Core COBOL.
- *
- * JSON:
- * {
- *   "cliente": { ... },
- *   "formaPago": "DV",
- *   "fechaEmision": "20260919",
- *   "items": [ ... ]
- * }
- *
- * formaPago: "CO" = Contado, "DV" = Divisa, "TR" = Transferencia, "CR" = Crédito
- * fechaEmision: formato AAAAMMDD (PIC 9(08))
- * items: máximo 10 items (OCCURS 10 TIMES en COBOL)
- */
 public class FacturaRequestDTO {
 
-    @JsonProperty("cliente")
-    private ClienteDTO cliente;
+    // ===== Sucursal (emisor) =====
+    private String nombreSucursal;
+    private String rifSucursal;
+    private String direccionSucursal;
+    private String ciudadSucursal;
+    private String estadoSucursal;
+    private String zonaPostal;
 
-    @JsonProperty("formaPago")
-    private String formaPago;           // "CO", "DV", "TR", "CR"
+    // ===== Cajero =====
+    private String cajeroCodigo;
+    private String cajeroNombre;
+    private String cajaNumero;
 
-    @JsonProperty("fechaEmision")
-    private String fechaEmision;        // "AAAAMMDD" (ej: "20260919")
+    // ===== Cliente (receptor) =====
+    private String rifCliente;
+    private String razonSocial;
 
-    @JsonProperty("items")
+    // ===== Factura =====
+    private String formaPago;
+    private String fechaEmision;
+    private String horaEmision;
+    private double montoPagado;
+
+    // ===== Items =====
     private List<ItemDTO> items = new ArrayList<>();
 
-    public FacturaRequestDTO() {}
+    // Getters y Setters
+    public String getNombreSucursal() { return nombreSucursal; }
+    public void setNombreSucursal(String nombreSucursal) { this.nombreSucursal = nombreSucursal; }
 
-    public ClienteDTO getCliente() { return cliente; }
-    public void setCliente(ClienteDTO cliente) { this.cliente = cliente; }
+    public String getRifSucursal() { return rifSucursal; }
+    public void setRifSucursal(String rifSucursal) { this.rifSucursal = rifSucursal; }
+
+    public String getDireccionSucursal() { return direccionSucursal; }
+    public void setDireccionSucursal(String direccionSucursal) { this.direccionSucursal = direccionSucursal; }
+
+    public String getCiudadSucursal() { return ciudadSucursal; }
+    public void setCiudadSucursal(String ciudadSucursal) { this.ciudadSucursal = ciudadSucursal; }
+
+    public String getEstadoSucursal() { return estadoSucursal; }
+    public void setEstadoSucursal(String estadoSucursal) { this.estadoSucursal = estadoSucursal; }
+
+    public String getZonaPostal() { return zonaPostal; }
+    public void setZonaPostal(String zonaPostal) { this.zonaPostal = zonaPostal; }
+
+    public String getCajeroCodigo() { return cajeroCodigo; }
+    public void setCajeroCodigo(String cajeroCodigo) { this.cajeroCodigo = cajeroCodigo; }
+
+    public String getCajeroNombre() { return cajeroNombre; }
+    public void setCajeroNombre(String cajeroNombre) { this.cajeroNombre = cajeroNombre; }
+
+    public String getCajaNumero() { return cajaNumero; }
+    public void setCajaNumero(String cajaNumero) { this.cajaNumero = cajaNumero; }
+
+    public String getRifCliente() { return rifCliente; }
+    public void setRifCliente(String rifCliente) { this.rifCliente = rifCliente; }
+
+    public String getRazonSocial() { return razonSocial; }
+    public void setRazonSocial(String razonSocial) { this.razonSocial = razonSocial; }
 
     public String getFormaPago() { return formaPago; }
     public void setFormaPago(String formaPago) { this.formaPago = formaPago; }
 
     public String getFechaEmision() { return fechaEmision; }
     public void setFechaEmision(String fechaEmision) { this.fechaEmision = fechaEmision; }
+
+    public String getHoraEmision() { return horaEmision; }
+    public void setHoraEmision(String horaEmision) { this.horaEmision = horaEmision; }
+
+    public double getMontoPagado() { return montoPagado; }
+    public void setMontoPagado(double montoPagado) { this.montoPagado = montoPagado; }
 
     public List<ItemDTO> getItems() { return items; }
     public void setItems(List<ItemDTO> items) { this.items = items; }

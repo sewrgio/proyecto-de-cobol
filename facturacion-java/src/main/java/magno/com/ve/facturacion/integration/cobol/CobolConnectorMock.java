@@ -5,11 +5,6 @@ import magno.com.ve.facturacion.integration.cobol.dto.FacturaResponseDTO;
 import magno.com.ve.facturacion.integration.cobol.dto.ItemDTO;
 import java.io.IOException;
 
-/**
- * Implementación simulada del CobolConnector.
- * Usada durante el desarrollo mientras el servidor COBOL real no está listo.
- * Aplica las mismas reglas de negocio (IVA 16%, IGTF 3% si forma de pago es "DV").
- */
 public class CobolConnectorMock implements CobolConnector {
 
     private static final double TASA_IVA = 0.16;
@@ -22,20 +17,9 @@ public class CobolConnectorMock implements CobolConnector {
 
         FacturaResponseDTO response = new FacturaResponseDTO();
 
-        // ===== Validaciones (mismo código de error que COBOL) =====
-        if (request.getCliente() == null
-            || request.getCliente().getCodigo() == null
-            || request.getCliente().getCodigo().trim().isEmpty()) {
+        if (request.getRifCliente() == null || request.getRifCliente().trim().isEmpty()) {
             response.setEstado("ERROR");
             response.setCodigoError(1);
-            response.setMensaje("Falta el código del cliente");
-            return response;
-        }
-
-        if (request.getCliente().getRif() == null
-            || request.getCliente().getRif().trim().isEmpty()) {
-            response.setEstado("ERROR");
-            response.setCodigoError(2);
             response.setMensaje("Falta el RIF del cliente");
             return response;
         }
@@ -47,7 +31,6 @@ public class CobolConnectorMock implements CobolConnector {
             return response;
         }
 
-        // ===== Cálculos (réplica de CALC-FACTURA + CALC-SENIAT) =====
         double baseImponible = 0.0;
         double baseExento = 0.0;
 
@@ -62,19 +45,14 @@ public class CobolConnectorMock implements CobolConnector {
 
         double iva = baseImponible * TASA_IVA;
         double igtf = 0.0;
-
-        // IGTF solo aplica si la forma de pago es "DV" (Divisas)
         if ("DV".equalsIgnoreCase(request.getFormaPago())) {
             igtf = (baseImponible + baseExento + iva) * TASA_IGTF;
         }
-
         double total = baseImponible + baseExento + iva + igtf;
 
-        // ===== Simular correlativo =====
         long numFactura = siguienteCorrelativo++;
         String numControl = String.format("00-%08d", numFactura);
 
-        // ===== Llenar respuesta =====
         response.setEstado("OK");
         response.setCodigoError(0);
         response.setNumeroFactura(numFactura);
@@ -84,16 +62,15 @@ public class CobolConnectorMock implements CobolConnector {
         response.setIva(redondear(iva));
         response.setIgtf(redondear(igtf));
         response.setTotal(redondear(total));
-
         return response;
     }
 
     @Override
     public boolean estaDisponible() {
-        return true; // El mock siempre está disponible
+        return true;
     }
 
-    private double redondear(double valor) {
-        return Math.round(valor * 100.0) / 100.0;
+    private double redondear(double v) {
+        return Math.round(v * 100.0) / 100.0;
     }
 }

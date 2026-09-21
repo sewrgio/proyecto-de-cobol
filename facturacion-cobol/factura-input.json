@@ -1,0 +1,22 @@
+{
+  "nombreSucursal": "INVERSIONES COLD 2024, C.A.",
+  "rifSucursal": "J-505366220",
+  "direccionSucursal": "CC. AA. Libertador, Nivel PB, Local 33",
+  "ciudadSucursal": "Caracas",
+  "estadoSucursal": "Distrito Capital",
+  "zonaPostal": "1053",
+  "cajeroCodigo": "013",
+  "cajeroNombre": "SONIA GALINDO",
+  "cajaNumero": "013",
+  "rifCliente": "V-30954597",
+  "razonSocial": "sergio perez",
+  "formaPago": "CO",
+  "fechaEmision": "20260920",
+  "horaEmision": "215959",
+  "montoPagado": "0.0",
+  "codigoItem": "1234679",
+  "nombreItem": "Producto 1234679",
+  "cantidadItem": "12",
+  "precioItem": "100.0",
+  "alicuotaItem": "G"
+}

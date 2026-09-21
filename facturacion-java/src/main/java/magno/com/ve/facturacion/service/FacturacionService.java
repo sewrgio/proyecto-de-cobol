@@ -3,15 +3,16 @@ package magno.com.ve.facturacion.service;
 import magno.com.ve.facturacion.domain.model.Cliente;
 import magno.com.ve.facturacion.domain.model.Producto;
 import magno.com.ve.facturacion.integration.cobol.CobolConnector;
+import magno.com.ve.facturacion.integration.cobol.CobolConnectorFile;
 import magno.com.ve.facturacion.integration.cobol.CobolConnectorMock;
 import magno.com.ve.facturacion.integration.cobol.CobolException;
-import magno.com.ve.facturacion.integration.cobol.dto.ClienteDTO;
 import magno.com.ve.facturacion.integration.cobol.dto.FacturaRequestDTO;
 import magno.com.ve.facturacion.integration.cobol.dto.FacturaResponseDTO;
 import magno.com.ve.facturacion.integration.cobol.dto.ItemDTO;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -20,8 +21,15 @@ public class FacturacionService {
     private final CobolConnector cobol;
 
     public FacturacionService() {
-        // En desarrollo usamos el Mock. En producción: new CobolConnectorSocket("192.168.1.100", 5000)
-        this.cobol = new CobolConnectorMock();
+        // Usar el conector real si el COBOL está disponible, si no el Mock
+        CobolConnector real = new CobolConnectorFile();
+        if (real.estaDisponible()) {
+            System.out.println("✅ Usando CobolConnectorFile (COBOL real)");
+            this.cobol = real;
+        } else {
+            System.out.println("⚠ COBOL no disponible, usando CobolConnectorMock");
+            this.cobol = new CobolConnectorMock();
+        }
     }
 
     public FacturacionService(CobolConnector cobol) {
@@ -68,28 +76,45 @@ public class FacturacionService {
         return log.toString();
     }
 
-    private FacturaRequestDTO construirRequest(Cliente cliente, List<Producto> items, String formaPago) {
-        FacturaRequestDTO request = new FacturaRequestDTO();
+    private FacturaRequestDTO construirRequest(Cliente cliente, List<Producto> items,
+                                                String formaPago) {
+        FacturaRequestDTO req = new FacturaRequestDTO();
 
-        ClienteDTO clienteDTO = new ClienteDTO(
-            cliente.getCedula(),
-            cliente.getCedula(),
-            cliente.getNombreCompleto()
-        );
-        request.setCliente(clienteDTO);
-        request.setFormaPago(formaPago);
-        request.setFechaEmision(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+        // Sucursal (datos por defecto, luego se cargarán de la empresa)
+        req.setNombreSucursal("INVERSIONES COLD 2024, C.A.");
+        req.setRifSucursal("J-505366220");
+        req.setDireccionSucursal("CC. AA. Libertador, Nivel PB, Local 33");
+        req.setCiudadSucursal("Caracas");
+        req.setEstadoSucursal("Distrito Capital");
+        req.setZonaPostal("1053");
 
+        // Cajero (por defecto)
+        req.setCajeroCodigo("013");
+        req.setCajeroNombre("SONIA GALINDO");
+        req.setCajaNumero("013");
+
+        // Cliente
+        req.setRifCliente(cliente.getCedula());
+        req.setRazonSocial(cliente.getNombreCompleto());
+
+        // Factura
+        req.setFormaPago(formaPago);
+        req.setFechaEmision(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+        req.setHoraEmision(LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")));
+        req.setMontoPagado(0.0);
+
+        // Items
         for (Producto p : items) {
             ItemDTO item = new ItemDTO(
                 p.getCodigo(),
+                p.getNombre(),
                 p.getCantidad(),
                 p.getPrecio(),
                 "G"
             );
-            request.addItem(item);
+            req.addItem(item);
         }
 
-        return request;
+        return req;
     }
 }

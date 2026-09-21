@@ -1,0 +1,11 @@
+{
+  "estado": "OK",
+  "codigoError": 0,
+  "numeroControl": "00-00000101",
+  "numeroFactura": 101,
+  "baseImponible": 1200.00,
+  "baseExento": 0.00,
+  "iva": 192.00,
+  "igtf": 0.00,
+  "total": 1392.00
+}
