@@ -5,7 +5,6 @@ import java.util.List;
 
 public class FacturaRequestDTO {
 
-    // ===== Sucursal (emisor) =====
     private String nombreSucursal;
     private String rifSucursal;
     private String direccionSucursal;
@@ -13,25 +12,22 @@ public class FacturaRequestDTO {
     private String estadoSucursal;
     private String zonaPostal;
 
-    // ===== Cajero =====
     private String cajeroCodigo;
     private String cajeroNombre;
     private String cajaNumero;
 
-    // ===== Cliente (receptor) =====
     private String rifCliente;
     private String razonSocial;
 
-    // ===== Factura =====
     private String formaPago;
     private String fechaEmision;
     private String horaEmision;
     private double montoPagado;
 
-    // ===== Items =====
     private List<ItemDTO> items = new ArrayList<>();
 
-    // Getters y Setters
+    public FacturaRequestDTO() {}
+
     public String getNombreSucursal() { return nombreSucursal; }
     public void setNombreSucursal(String nombreSucursal) { this.nombreSucursal = nombreSucursal; }
 

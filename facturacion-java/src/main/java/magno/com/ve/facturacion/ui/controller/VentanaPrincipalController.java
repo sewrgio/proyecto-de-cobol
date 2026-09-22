@@ -1,27 +1,31 @@
 package magno.com.ve.facturacion.ui.controller;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import magno.com.ve.facturacion.App;
 import magno.com.ve.facturacion.config.AppConfig;
 import magno.com.ve.facturacion.domain.enums.Rol;
 import magno.com.ve.facturacion.domain.model.Usuario;
 
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class VentanaPrincipalController {
 
     @FXML private Label lblEmpresa;
     @FXML private Label lblUsuario;
     @FXML private Label lblRol;
-    @FXML private Button btnCerrarSesion;
-    @FXML private TabPane tabPane;
+    @FXML private Label lblFechaHora;
+    @FXML private Label lblBreadcrumb;
     @FXML private Label lblEstado;
     @FXML private Label lblVersion;
+    @FXML private Button btnCerrarSesion;
+    @FXML private StackPane contenidoPrincipal;
+    @FXML private TextField txtBusquedaGlobal;
 
     private Usuario usuarioActual;
 
@@ -31,99 +35,97 @@ public class VentanaPrincipalController {
     public void setUsuario(Usuario usuario) {
         this.usuarioActual = usuario;
 
-        System.out.println("═══════════════════════════════════════");
-        System.out.println(" USUARIO SETEADO");
-        System.out.println("  Username: " + usuario.getUsername());
-        System.out.println("  Rol:      " + usuario.getRol());
-        System.out.println("═══════════════════════════════════════");
-
         lblUsuario.setText(usuario.getNombreCompleto());
         lblRol.setText(usuario.getRol() != null ? usuario.getRol().getNombre() : "—");
         lblVersion.setText(AppConfig.NOMBRE_SISTEMA + " v" + AppConfig.VERSION);
 
-        construirPestanas();
+        // Fecha/hora
+        String fecha = LocalDateTime.now().format(
+            DateTimeFormatter.ofPattern("EEEE dd/MM/yyyy - HH:mm"));
+        lblFechaHora.setText(fecha);
+
+        // Cargar contenido inicial según rol
+        cargarContenidoInicial();
     }
 
-    private void construirPestanas() {
-        tabPane.getTabs().clear();
+    private void cargarContenidoInicial() {
         Rol rol = usuarioActual.getRol();
 
         if (rol == Rol.ADMINISTRADOR) {
-            agregarPestanaSegura("Almacén", "/magno/com/ve/facturacion/view/PanelAlmacen.fxml");
-            agregarPestanaSegura("Facturación", "/magno/com/ve/facturacion/view/PanelFacturacion.fxml");
-            agregarPestanaProximamente("Reportes");
-            agregarPestanaProximamente("Configuración");
+            mostrarAlmacen();
+        } else if (rol == Rol.CAJERO) {
+            mostrarFacturacion();
+        } else if (rol == Rol.ALMACENISTA) {
+            mostrarAlmacen();
         }
-        else if (rol == Rol.CAJERO) {
-            agregarPestanaSegura("Facturación", "/magno/com/ve/facturacion/view/PanelFacturacion.fxml");
-        }
-        else if (rol == Rol.ALMACENISTA) {
-            agregarPestanaSegura("Almacén", "/magno/com/ve/facturacion/view/PanelAlmacen.fxml");
-        }
-        else {
-            agregarPestanaProximamente("Sin acceso");
-        }
-
-        // 🔑 Ocultar la barra de pestañas si solo hay 1
-        if (tabPane.getTabs().size() <= 1) {
-            Platform.runLater(() -> {
-                tabPane.lookupAll(".tab-header-area").forEach(node -> {
-                    node.setStyle("-fx-pref-height: 0; -fx-max-height: 0; -fx-min-height: 0;");
-                    node.setVisible(false);
-                    node.setManaged(false);
-                });
-                tabPane.lookupAll(".tab-header-background").forEach(node -> {
-                    node.setStyle("-fx-pref-height: 0; -fx-max-height: 0; -fx-min-height: 0;");
-                    node.setVisible(false);
-                    node.setManaged(false);
-                });
-            });
-        }
-
-        tabPane.getSelectionModel().selectedItemProperty().addListener(
-            (obs, oldTab, newTab) -> {
-                if (newTab != null) {
-                    actualizarEstado("Módulo: " + newTab.getText());
-                }
-            }
-        );
     }
 
-    private void agregarPestanaSegura(String titulo, String fxmlPath) {
-        URL recurso = getClass().getResource(fxmlPath);
+    @FXML
+    public void handleMenuAlmacen() {
+        mostrarAlmacen();
+    }
 
+    @FXML
+    public void handleMenuFacturacion() {
+        mostrarFacturacion();
+    }
+
+    @FXML
+    public void handleMenuClientes() {
+        cargarVista("Clientes", "/magno/com/ve/facturacion/view/PanelCliente.fxml");
+    }
+
+    @FXML
+    public void handleMenuReportes() {
+        cargarVista("Reportes", null);
+    }
+
+    private void mostrarAlmacen() {
+        cargarVista("Almacén", "/magno/com/ve/facturacion/view/PanelAlmacen.fxml");
+    }
+
+    private void mostrarFacturacion() {
+        cargarVista("Facturación", "/magno/com/ve/facturacion/view/PanelFacturacion.fxml");
+    }
+
+    /**
+     * Carga una vista en el área de contenido principal.
+     */
+    private void cargarVista(String nombre, String fxmlPath) {
+        lblBreadcrumb.setText("Inicio  ›  " + nombre);
+        lblEstado.setText("Módulo: " + nombre);
+
+        if (fxmlPath == null) {
+            // Placeholder
+            contenidoPrincipal.getChildren().clear();
+            contenidoPrincipal.getChildren().add(crearPlaceholder(nombre));
+            return;
+        }
+
+        URL recurso = getClass().getResource(fxmlPath);
         if (recurso == null) {
-            Tab tab = new Tab(titulo, crearPanelPlaceholder(titulo,
-                "Este módulo aún no está implementado."));
-            tab.setClosable(false);
-            tabPane.getTabs().add(tab);
+            contenidoPrincipal.getChildren().clear();
+            contenidoPrincipal.getChildren().add(crearPlaceholder(nombre + " (no implementado)"));
             return;
         }
 
         try {
             FXMLLoader loader = new FXMLLoader(recurso);
-            Parent contenido = loader.load();
-            Tab tab = new Tab(titulo, contenido);
-            tab.setClosable(false);
-            tabPane.getTabs().add(tab);
-        } catch (Exception e) {
-            Tab tab = new Tab(titulo, crearPanelPlaceholder(titulo,
-                "Error al cargar el módulo: " + e.getMessage()));
-            tab.setClosable(false);
-            tabPane.getTabs().add(tab);
+            Parent vista = loader.load();
+            contenidoPrincipal.getChildren().clear();
+            contenidoPrincipal.getChildren().add(vista);
+            System.out.println("✅ Vista cargada: " + nombre);
+        } catch (Throwable e) {
             System.err.println("❌ Error cargando " + fxmlPath + ": " + e.getMessage());
+            e.printStackTrace();
+            contenidoPrincipal.getChildren().clear();
+            contenidoPrincipal.getChildren().add(
+                crearPlaceholder("Error: " + e.getMessage()));
         }
     }
 
-    private void agregarPestanaProximamente(String titulo) {
-        Tab tab = new Tab(titulo, crearPanelPlaceholder(titulo,
-            "Este módulo estará disponible próximamente"));
-        tab.setClosable(false);
-        tabPane.getTabs().add(tab);
-    }
-
-    private VBox crearPanelPlaceholder(String titulo, String mensaje) {
-        VBox box = new VBox(20);
+    private javafx.scene.layout.VBox crearPlaceholder(String titulo) {
+        javafx.scene.layout.VBox box = new javafx.scene.layout.VBox(20);
         box.setAlignment(javafx.geometry.Pos.CENTER);
         box.setStyle("-fx-background-color: #F8FAFC;");
 
@@ -133,17 +135,11 @@ public class VentanaPrincipalController {
         Label lblTitulo = new Label(titulo);
         lblTitulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;");
 
-        Label lblMensaje = new Label(mensaje);
+        Label lblMensaje = new Label("Este módulo estará disponible próximamente");
         lblMensaje.setStyle("-fx-font-size: 13px; -fx-text-fill: #64748B;");
 
         box.getChildren().addAll(icono, lblTitulo, lblMensaje);
         return box;
-    }
-
-    public void actualizarEstado(String mensaje) {
-        if (lblEstado != null) {
-            lblEstado.setText(mensaje);
-        }
     }
 
     @FXML

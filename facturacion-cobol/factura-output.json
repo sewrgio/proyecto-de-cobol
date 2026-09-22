@@ -3,9 +3,9 @@
   "codigoError": 0,
   "numeroControl": "00-00000101",
   "numeroFactura": 101,
-  "baseImponible": 1200.00,
+  "baseImponible": 106946.00,
   "baseExento": 0.00,
-  "iva": 192.00,
+  "iva": 17111.36,
   "igtf": 0.00,
-  "total": 1392.00
+  "total": 124057.36
 }

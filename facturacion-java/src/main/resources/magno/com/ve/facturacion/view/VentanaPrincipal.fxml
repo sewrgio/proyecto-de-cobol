@@ -7,59 +7,116 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="magno.com.ve.facturacion.ui.controller.VentanaPrincipalController"
-            prefWidth="1280" prefHeight="850"
+            prefWidth="1400" prefHeight="900"
             styleClass="main-root">
 
-    <!-- ============================================================
+    <!-- ═══════════════════════════════════════════════════════════
          BARRA SUPERIOR
-         ============================================================ -->
+         ═══════════════════════════════════════════════════════════ -->
     <top>
         <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
             <padding>
                 <Insets top="0" right="24" bottom="0" left="24"/>
             </padding>
 
-            <!-- Logo MAGNO -->
             <Label text="MAGNO" styleClass="top-bar-logo"/>
-
-            <!-- Separador -->
             <Label text="  │  " styleClass="top-bar-separator"/>
-
-            <!-- Empresa -->
             <Label fx:id="lblEmpresa" text="Empresa Demo" styleClass="top-bar-empresa"/>
 
-            <!-- Espacio flexible -->
+            <Region prefWidth="30"/>
+            <TextField fx:id="txtBusquedaGlobal"
+                       promptText="🔍 Buscar productos, clientes, facturas..."
+                       styleClass="top-bar-search"
+                       prefWidth="350"/>
+
             <Region HBox.hgrow="ALWAYS"/>
 
-            <!-- Usuario -->
             <Label fx:id="lblUsuario" text="Usuario" styleClass="top-bar-usuario"/>
-
             <Region prefWidth="12"/>
-
-            <!-- Rol -->
             <Label fx:id="lblRol" text="Rol" styleClass="top-bar-rol"/>
-
             <Region prefWidth="16"/>
 
-            <!-- Botón Cerrar sesión -->
             <Button fx:id="btnCerrarSesion" text="Cerrar sesión"
                     styleClass="btn-logout"
                     onAction="#handleCerrarSesion"/>
         </HBox>
     </top>
 
-    <!-- ============================================================
-         CENTRO: PESTAÑAS DE MÓDULOS
-         ============================================================ -->
+    <!-- ═══════════════════════════════════════════════════════════
+         CENTRO: Sidebar + Contenido
+         ═══════════════════════════════════════════════════════════ -->
     <center>
-        <TabPane fx:id="tabPane" styleClass="tab-pane" tabClosingPolicy="UNAVAILABLE">
-            <!-- Las pestañas se agregan dinámicamente desde el controller -->
-        </TabPane>
+        <HBox spacing="0">
+
+            <!-- ═══ SIDEBAR ═══ -->
+            <VBox styleClass="sidebar" prefWidth="220" minWidth="220">
+                <padding>
+                    <Insets top="16" right="12" bottom="16" left="12"/>
+                </padding>
+
+                <!-- Menú principal -->
+                <Label text="MENÚ PRINCIPAL" styleClass="sidebar-section"/>
+
+                <Button fx:id="btnMenuAlmacen" text="📦  Almacén"
+                        styleClass="sidebar-item" maxWidth="Infinity"
+                        onAction="#handleMenuAlmacen"/>
+                <Button fx:id="btnMenuFacturacion" text="🧾  Facturación"
+                        styleClass="sidebar-item" maxWidth="Infinity"
+                        onAction="#handleMenuFacturacion"/>
+                <Button fx:id="btnMenuClientes" text="👥  Clientes"
+                        styleClass="sidebar-item" maxWidth="Infinity"
+                        onAction="#handleMenuClientes"/>
+
+                <Region prefHeight="20"/>
+                <Label text="REPORTES" styleClass="sidebar-section"/>
+
+                <Button fx:id="btnMenuReportes" text="📊  Reportes"
+                        styleClass="sidebar-item" maxWidth="Infinity"
+                        onAction="#handleMenuReportes"/>
+                <Button fx:id="btnMenuCierreZ" text="🧾  Cierre Z"
+                        styleClass="sidebar-item" maxWidth="Infinity"/>
+
+                <Region prefHeight="20"/>
+                <Label text="SISTEMA" styleClass="sidebar-section"/>
+
+                <Button fx:id="btnMenuUsuarios" text="👤  Usuarios"
+                        styleClass="sidebar-item" maxWidth="Infinity"/>
+                <Button fx:id="btnMenuConfig" text="⚙️  Configuración"
+                        styleClass="sidebar-item" maxWidth="Infinity"/>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <!-- Info de versión -->
+                <Separator/>
+                <Label text="MAGNO v1.0.0" styleClass="sidebar-footer"/>
+                <Label text="© 2026 MAGNO" styleClass="sidebar-footer"/>
+            </VBox>
+
+            <!-- ═══ CONTENIDO PRINCIPAL ═══ -->
+            <VBox styleClass="main-content" HBox.hgrow="ALWAYS">
+
+                <!-- Breadcrumbs + acciones -->
+                <HBox styleClass="breadcrumb-bar" alignment="CENTER_LEFT" spacing="10">
+                    <padding>
+                        <Insets top="12" right="24" bottom="12" left="24"/>
+                    </padding>
+
+                    <Label fx:id="lblBreadcrumb" text="Inicio" styleClass="breadcrumb-current"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblFechaHora" text="—" styleClass="breadcrumb-info"/>
+                </HBox>
+
+                <!-- Contenido dinámico -->
+                <StackPane fx:id="contenidoPrincipal" VBox.vgrow="ALWAYS">
+                    <!-- El contenido se carga dinámicamente aquí -->
+                </StackPane>
+            </VBox>
+        </HBox>
     </center>
 
-    <!-- ============================================================
-         BARRA DE ESTADO INFERIOR
-         ============================================================ -->
+    <!-- ═══════════════════════════════════════════════════════════
+         BARRA DE ESTADO
+         ═══════════════════════════════════════════════════════════ -->
     <bottom>
         <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="0">
             <padding>
@@ -67,9 +124,7 @@
             </padding>
 
             <Label fx:id="lblEstado" text="Listo" styleClass="status-text"/>
-
             <Region HBox.hgrow="ALWAYS"/>
-
             <Label fx:id="lblVersion" text="MAGNO v1.0.0" styleClass="status-text"/>
         </HBox>
     </bottom>

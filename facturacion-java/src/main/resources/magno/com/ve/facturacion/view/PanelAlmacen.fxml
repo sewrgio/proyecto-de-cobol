@@ -9,142 +9,203 @@
             fx:controller="magno.com.ve.facturacion.ui.controller.PanelAlmacenController"
             styleClass="panel-root">
 
-    <!-- ============================================================
+    <!-- ═══════════════════════════════════════════════════════════
          ENCABEZADO
-         ============================================================ -->
+         ═══════════════════════════════════════════════════════════ -->
     <top>
         <VBox styleClass="panel-header">
-            <padding>
-                <Insets top="20" right="30" bottom="20" left="30"/>
-            </padding>
-            <Label text="Registrar Nuevo Producto" styleClass="section-title"/>
-            <Label text="Complete los datos del producto para agregarlo al almacén"
-                   styleClass="section-subtitle"/>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <VBox>
+                    <Label text="📦 Gestión de Almacén" styleClass="section-title"/>
+                    <Label text="Registre y administre productos del inventario" styleClass="section-subtitle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="📋 Listar Productos" styleClass="btn-secondary"
+                        prefHeight="38" onAction="#handleListarProductos"/>
+                <Button text="🔄 Sincronizar con COBOL" styleClass="btn-secondary"
+                        prefHeight="38" onAction="#handleSincronizar"/>
+            </HBox>
         </VBox>
     </top>
 
-    <!-- ============================================================
-         CENTRO: FORMULARIO (scrollable)
-         ============================================================ -->
+    <!-- ═══════════════════════════════════════════════════════════
+         CENTRO: Formulario + Lista
+         ═══════════════════════════════════════════════════════════ -->
     <center>
-        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+        <HBox spacing="12">
             <padding>
-                <Insets top="20" right="30" bottom="20" left="30"/>
+                <Insets top="12" right="12" bottom="12" left="12"/>
             </padding>
 
-            <VBox spacing="16">
+            <!-- ═══ FORMULARIO (izquierda) ═══ -->
+            <VBox spacing="12" prefWidth="520" minWidth="480">
+                <ScrollPane fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+                    <VBox spacing="12">
 
-                <!-- ===== TARJETA: Identificación ===== -->
-                <VBox styleClass="card" spacing="12">
-                    <Label text="Identificación del Producto" styleClass="card-title"/>
+                        <!-- Identificación -->
+                        <VBox styleClass="card" spacing="10">
+                            <Label text="📋 Identificación" styleClass="card-title"/>
 
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Código (12 dígitos) *" styleClass="field-label"/>
-                            <TextField fx:id="txtCodigo" promptText="Ej: 123456789012" styleClass="text-field"/>
+                            <HBox spacing="10">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Código (12 dígitos) *" styleClass="field-label"/>
+                                    <TextField fx:id="txtCodigo" promptText="Ej: 123456789012"
+                                               styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Código de fabricación *" styleClass="field-label"/>
+                                    <TextField fx:id="txtCodigoFabricacion" promptText="Ej: FAB-2024-A001"
+                                               styleClass="text-field"/>
+                                </VBox>
+                            </HBox>
+
+                            <VBox spacing="5">
+                                <Label text="Nombre del producto *" styleClass="field-label"/>
+                                <TextField fx:id="txtNombre" promptText="Ej: Laptop HP 15 pulgadas"
+                                           styleClass="text-field"/>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="Descripción" styleClass="field-label"/>
+                                <TextField fx:id="txtDescripcion" promptText="Descripción opcional"
+                                           styleClass="text-field"/>
+                            </VBox>
                         </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Código de fabricación *" styleClass="field-label"/>
-                            <TextField fx:id="txtCodigoFabricacion" promptText="Ej: FAB-2024-A001" styleClass="text-field"/>
-                        </VBox>
-                    </HBox>
 
-                    <VBox spacing="6">
-                        <Label text="Nombre del producto *" styleClass="field-label"/>
-                        <TextField fx:id="txtNombre" promptText="Ej: Laptop HP 15 pulgadas" styleClass="text-field"/>
+                        <!-- Fabricación -->
+                        <VBox styleClass="card" spacing="10">
+                            <Label text="🏭 Fabricación" styleClass="card-title"/>
+
+                            <HBox spacing="10">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Compañía de fabricación *" styleClass="field-label"/>
+                                    <TextField fx:id="txtCompania" promptText="Ej: Samsung Electronics Co."
+                                               styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="País de origen *" styleClass="field-label"/>
+                                    <ComboBox fx:id="cmbPais" styleClass="combo-box" maxWidth="Infinity"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Medidas -->
+                        <VBox styleClass="card" spacing="10">
+                            <Label text="📏 Medidas" styleClass="card-title"/>
+
+                            <HBox spacing="10">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Peso" styleClass="field-label"/>
+                                    <TextField fx:id="txtPeso" promptText="Ej: 2.5" styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Unidad peso" styleClass="field-label"/>
+                                    <ComboBox fx:id="cmbUnidadPeso" styleClass="combo-box" maxWidth="Infinity"/>
+                                </VBox>
+                            </HBox>
+
+                            <HBox spacing="10">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Altura" styleClass="field-label"/>
+                                    <TextField fx:id="txtAltura" promptText="Ej: 35" styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Anchura" styleClass="field-label"/>
+                                    <TextField fx:id="txtAnchura" promptText="Ej: 25" styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Grosor" styleClass="field-label"/>
+                                    <TextField fx:id="txtGrosor" promptText="Ej: 2" styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Unidad" styleClass="field-label"/>
+                                    <ComboBox fx:id="cmbUnidadDimension" styleClass="combo-box" maxWidth="Infinity"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Precio y Stock -->
+                        <VBox styleClass="card" spacing="10">
+                            <Label text="💰 Precio y Stock" styleClass="card-title"/>
+
+                            <HBox spacing="10">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Precio ($) *" styleClass="field-label"/>
+                                    <TextField fx:id="txtPrecio" promptText="Ej: 1200.00" styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Stock inicial *" styleClass="field-label"/>
+                                    <TextField fx:id="txtStockInicial" promptText="Ej: 50" styleClass="text-field"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
                     </VBox>
+                </ScrollPane>
 
-                    <VBox spacing="6">
-                        <Label text="Descripción" styleClass="field-label"/>
-                        <TextField fx:id="txtDescripcion" promptText="Descripción opcional" styleClass="text-field"/>
-                    </VBox>
-                </VBox>
-
-                <!-- ===== TARJETA: Fabricación ===== -->
-                <VBox styleClass="card" spacing="12">
-                    <Label text="Fabricación" styleClass="card-title"/>
-
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Compañía de fabricación *" styleClass="field-label"/>
-                            <TextField fx:id="txtCompania" promptText="Ej: Samsung Electronics Co." styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="País de origen *" styleClass="field-label"/>
-                            <ComboBox fx:id="cmbPais" styleClass="combo-box" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-                <!-- ===== TARJETA: Medidas ===== -->
-                <VBox styleClass="card" spacing="12">
-                    <Label text="Medidas" styleClass="card-title"/>
-
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Peso" styleClass="field-label"/>
-                            <TextField fx:id="txtPeso" promptText="Ej: 2.5" styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Unidad de peso" styleClass="field-label"/>
-                            <ComboBox fx:id="cmbUnidadPeso" styleClass="combo-box" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Altura" styleClass="field-label"/>
-                            <TextField fx:id="txtAltura" promptText="Ej: 35" styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Anchura" styleClass="field-label"/>
-                            <TextField fx:id="txtAnchura" promptText="Ej: 25" styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Grosor" styleClass="field-label"/>
-                            <TextField fx:id="txtGrosor" promptText="Ej: 2" styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Unidad de dimensión" styleClass="field-label"/>
-                            <ComboBox fx:id="cmbUnidadDimension" styleClass="combo-box" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-                <!-- ===== TARJETA: Precio y Stock ===== -->
-                <VBox styleClass="card" spacing="12">
-                    <Label text="Precio y Stock" styleClass="card-title"/>
-
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Precio ($) *" styleClass="field-label"/>
-                            <TextField fx:id="txtPrecio" promptText="Ej: 1200.00" styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Stock inicial *" styleClass="field-label"/>
-                            <TextField fx:id="txtStockInicial" promptText="Ej: 50" styleClass="text-field"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-                <Region prefHeight="10"/>
-
+                <!-- Botones del formulario -->
+                <HBox spacing="10">
+                    <Button text="🧹 Limpiar" styleClass="btn-secondary"
+                            HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            prefHeight="42" onAction="#handleLimpiar"/>
+                    <Button text="💾 Registrar Producto" styleClass="btn-primary"
+                            HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                            prefHeight="42" onAction="#handleGuardar"/>
+                </HBox>
             </VBox>
-        </ScrollPane>
+
+            <!-- ═══ LISTA DE PRODUCTOS (derecha) ═══ -->
+            <VBox styleClass="card" spacing="8" HBox.hgrow="ALWAYS">
+                <padding>
+                    <Insets top="12" right="12" bottom="12" left="12"/>
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="📋 Productos Registrados" styleClass="card-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblTotalProductos" text="0 productos" styleClass="pos-items-count"/>
+                </HBox>
+
+                <TextField fx:id="txtFiltrarProductos"
+                           promptText="🔍 Filtrar productos..."
+                           styleClass="pos-search-field"/>
+
+                <TableView fx:id="tblProductos" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colProdCodigo" text="Código" prefWidth="120"/>
+                        <TableColumn fx:id="colProdNombre" text="Producto" prefWidth="220"/>
+                        <TableColumn fx:id="colProdPrecio" text="Precio" prefWidth="90"/>
+                        <TableColumn fx:id="colProdStock" text="Stock" prefWidth="70"/>
+                        <TableColumn fx:id="colProdCategoria" text="Categoría" prefWidth="120"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="📦 No hay productos registrados"/>
+                    </placeholder>
+                </TableView>
+
+                <HBox spacing="8">
+                    <Button text="✏️ Editar" styleClass="pos-btn-secondary"
+                            HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Button text="🗑️ Eliminar" styleClass="pos-btn-secondary"
+                            HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Button text="🔄 Actualizar" styleClass="pos-btn-secondary"
+                            HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                </HBox>
+            </VBox>
+        </HBox>
     </center>
 
-    <!-- ============================================================
-         BOTONES INFERIORES
-         ============================================================ -->
+    <!-- ═══════════════════════════════════════════════════════════
+         BARRA DE ESTADO
+         ═══════════════════════════════════════════════════════════ -->
     <bottom>
-        <HBox styleClass="panel-footer" alignment="CENTER_RIGHT" spacing="12">
+        <HBox styleClass="pos-status-bar" alignment="CENTER_LEFT" spacing="10">
             <padding>
-                <Insets top="15" right="30" bottom="15" left="30"/>
+                <Insets top="4" right="15" bottom="4" left="15"/>
             </padding>
-            <Button fx:id="btnLimpiar" text="Cancelar" styleClass="btn-secondary"
-                    prefWidth="120" prefHeight="42" onAction="#handleLimpiar"/>
-            <Button fx:id="btnGuardar" text="Registrar Producto" styleClass="btn-primary"
-                    prefWidth="180" prefHeight="42" onAction="#handleGuardar"/>
+            <Label fx:id="lblMensajeEstado" text="🟢 Listo"
+                   styleClass="pos-status-message" HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblContadorProductos" text="0 productos" styleClass="pos-status-info"/>
         </HBox>
     </bottom>
 </BorderPane>

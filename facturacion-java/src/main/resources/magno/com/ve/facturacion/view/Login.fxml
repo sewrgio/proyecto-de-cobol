@@ -8,9 +8,9 @@
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="magno.com.ve.facturacion.ui.controller.LoginController"
            styleClass="login-root"
-           prefWidth="500" prefHeight="600">
+           prefWidth="500" prefHeight="620">
 
-    <VBox alignment="CENTER" spacing="0" styleClass="login-card" maxWidth="420" maxHeight="520">
+    <VBox alignment="CENTER" spacing="0" styleClass="login-card" maxWidth="420" maxHeight="540">
         <padding>
             <Insets top="40" right="40" bottom="40" left="40"/>
         </padding>

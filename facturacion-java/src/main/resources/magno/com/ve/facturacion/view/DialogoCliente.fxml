@@ -27,7 +27,7 @@
          FORMULARIO
          ============================================================ -->
     <center>
-        <ScrollPane fitToWidth="true" styleClass="scroll-pane" hbarPolicy="NEVER">
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
             <padding>
                 <Insets top="20" right="30" bottom="20" left="30"/>
             </padding>
