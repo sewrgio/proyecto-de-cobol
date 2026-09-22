@@ -56,7 +56,7 @@ public class FacturacionService {
             log.append("-----------------------------------------\n");
             for (Producto p : items) {
                 log.append(String.format("%-20s x%d  $%.2f\n",
-                    p.getNombre(), p.getCantidad(), p.getSubtotal()));
+                    p.getNombreProducto(), p.getCantidad(), p.getSubtotal()));
             }
             log.append("-----------------------------------------\n");
             log.append(String.format("Base Imponible: $%.2f\n", response.getBaseImponible()));
@@ -106,8 +106,8 @@ public class FacturacionService {
         // Items
         for (Producto p : items) {
             ItemDTO item = new ItemDTO(
-                p.getCodigo(),
-                p.getNombre(),
+                p.getCodigoBarra(),
+                p.getNombreProducto(),
                 p.getCantidad(),
                 p.getPrecio(),
                 "G"

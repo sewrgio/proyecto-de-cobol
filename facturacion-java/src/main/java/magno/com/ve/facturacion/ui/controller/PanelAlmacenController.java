@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import magno.com.ve.facturacion.domain.enums.ClasificacionProducto;
 import magno.com.ve.facturacion.domain.enums.UnidadMedida;
 import magno.com.ve.facturacion.domain.model.Producto;
 import magno.com.ve.facturacion.exception.ValidacionException;
@@ -13,45 +14,79 @@ import magno.com.ve.facturacion.util.Validaciones;
 
 public class PanelAlmacenController {
 
-    @FXML private TextField txtCodigo;
-    @FXML private TextField txtCodigoFabricacion;
-    @FXML private TextField txtNombre;
+    // ══════════════════════════════════════════════
+    // IDENTIFICACIÓN DEL PRODUCTO
+    // ══════════════════════════════════════════════
+    @FXML private TextField txtNumeroBarra;
+    @FXML private TextField txtNombreProducto;
+    @FXML private ComboBox<ClasificacionProducto> cmbTipoProducto;
+    @FXML private TextField txtMarcaProducto;
+    @FXML private ComboBox<String> cmbUnidadMedida;   // bulto, docena, unidad, etc.
+    @FXML private TextField txtCantidad;
     @FXML private TextField txtDescripcion;
+
+    // ══════════════════════════════════════════════
+    // FÁBRICA
+    // ══════════════════════════════════════════════
     @FXML private TextField txtCompania;
     @FXML private ComboBox<String> cmbPais;
-    @FXML private TextField txtPeso;
-    @FXML private ComboBox<UnidadMedida> cmbUnidadPeso;
-    @FXML private TextField txtAltura;
-    @FXML private TextField txtAnchura;
-    @FXML private TextField txtGrosor;
-    @FXML private ComboBox<UnidadMedida> cmbUnidadDimension;
-    @FXML private TextField txtPrecio;
-    @FXML private TextField txtStockInicial;
+    @FXML private TextField txtRif;
+
+    // ══════════════════════════════════════════════
+    // MEDIDAS
+    // ══════════════════════════════════════════════
+    @FXML private ComboBox<UnidadMedida> cmbTipoMedida;      // kg, g, L, mL, etc.
+    @FXML private TextField txtCantidadMedida;               // ej: 1
+    @FXML private TextField txtContenido;                    // ej: 1000
+    @FXML private ComboBox<UnidadMedida> cmbTipoDimension;   // cm, mm, m, etc.
+    @FXML private TextField txtCantidadDimension;            // ej: 20
+
+    // ══════════════════════════════════════════════
+    // PRECIO
+    // ══════════════════════════════════════════════
+    @FXML private TextField txtPrecioFactura;
 
     private final ProductoService productoService = new ProductoService();
 
+    // =====================================================
+    // INICIALIZACIÓN
+    // =====================================================
     @FXML
     public void initialize() {
-        // Poblar combo de países
+        // Tipo de producto
+        cmbTipoProducto.setItems(FXCollections.observableArrayList(ClasificacionProducto.values()));
+        cmbTipoProducto.getSelectionModel().selectFirst();
+
+        // Unidad de medida del empaque
+        cmbUnidadMedida.setItems(FXCollections.observableArrayList(
+            "Unidad", "Par", "Docena", "Media docena", "Veintena",
+            "Bulto", "Caja", "Paquete", "Saco", "Paleta"
+        ));
+        cmbUnidadMedida.getSelectionModel().selectFirst();
+
+        // Países
         cmbPais.setItems(FXCollections.observableArrayList(Validaciones.getPaisesValidos()));
         cmbPais.getSelectionModel().select("Venezuela");
 
-        // Poblar combo de unidades
-        cmbUnidadPeso.setItems(FXCollections.observableArrayList(UnidadMedida.values()));
-        cmbUnidadPeso.getSelectionModel().select(UnidadMedida.KILOGRAMO);
+        // Tipo de medida (magnitud física: peso/volumen)
+        cmbTipoMedida.setItems(FXCollections.observableArrayList(UnidadMedida.values()));
+        cmbTipoMedida.getSelectionModel().select(UnidadMedida.KILOGRAMO);
 
-        cmbUnidadDimension.setItems(FXCollections.observableArrayList(UnidadMedida.values()));
-        cmbUnidadDimension.getSelectionModel().select(UnidadMedida.CENTIMETRO);
+        // Tipo de dimensión (longitud)
+        cmbTipoDimension.setItems(FXCollections.observableArrayList(UnidadMedida.values()));
+        cmbTipoDimension.getSelectionModel().select(UnidadMedida.CENTIMETRO);
     }
 
+    // =====================================================
+    // ACCIONES
+    // =====================================================
     @FXML
     public void handleGuardar() {
         try {
             Producto producto = construirProducto();
             productoService.validar(producto);
 
-            // TODO: Guardar en ProductoRepository cuando esté conectado
-
+            // TODO: guardar en repository
             mostrarExito(producto);
             limpiarFormulario();
 
@@ -59,7 +94,7 @@ public class PanelAlmacenController {
             mostrarError("Errores de Validación", ex.getMessage());
         } catch (NumberFormatException ex) {
             mostrarError("Error de Formato",
-                "Verifique que los campos numéricos (peso, medidas, precio, stock) sean válidos.");
+                "Verifique que los campos numéricos sean válidos.");
         } catch (Exception ex) {
             mostrarError("Error Inesperado", ex.getMessage());
             ex.printStackTrace();
@@ -71,29 +106,42 @@ public class PanelAlmacenController {
         limpiarFormulario();
     }
 
+    // =====================================================
+    // MAPEO UI → MODELO
+    // =====================================================
     private Producto construirProducto() throws NumberFormatException {
         Producto p = new Producto();
-        p.setCodigo(txtCodigo.getText().trim());
-        p.setCodigoFabricacion(txtCodigoFabricacion.getText().trim().toUpperCase());
-        p.setNombre(txtNombre.getText().trim());
+
+        // ── Identificación
+        p.setCodigoBarra(txtNumeroBarra.getText().trim());
+        p.setNombreProducto(txtNombreProducto.getText().trim());
+        p.setTipoProducto(cmbTipoProducto.getValue());
+        p.setMarcaProducto(txtMarcaProducto.getText().trim());
+        p.setUnidadMedida(cmbUnidadMedida.getValue());
+        p.setCantidad(parseIntObligatorio(txtCantidad.getText()));
         p.setDescripcion(txtDescripcion.getText().trim());
+
+        // ── Fábrica
         p.setCompaniaFabricacion(txtCompania.getText().trim());
         p.setPaisOrigen(cmbPais.getValue());
+        p.setIdentificador(txtRif.getText().trim().toUpperCase());
 
-        p.setPeso(parseDouble(txtPeso.getText()));
-        p.setUnidadPeso(cmbUnidadPeso.getValue());
+        // ── Medidas
+        p.setUnidadPeso(cmbTipoMedida.getValue());
+        p.setCantidadMedida(parseDouble(txtCantidadMedida.getText()));
+        p.setContenido(parseDouble(txtContenido.getText()));
+        p.setUnidadDimension(cmbTipoDimension.getValue());
+        p.setCantidadDimension(parseDouble(txtCantidadDimension.getText()));
 
-        p.setAltura(parseDouble(txtAltura.getText()));
-        p.setAnchura(parseDouble(txtAnchura.getText()));
-        p.setGrosor(parseDouble(txtGrosor.getText()));
-        p.setUnidadDimension(cmbUnidadDimension.getValue());
-
-        p.setPrecio(parseDoubleObligatorio(txtPrecio.getText()));
-        p.setCantidad(parseIntObligatorio(txtStockInicial.getText()));
+        // ── Precio
+        p.setPrecio(parseDoubleObligatorio(txtPrecioFactura.getText()));
 
         return p;
     }
 
+    // =====================================================
+    // CONVERSORES
+    // =====================================================
     private Double parseDouble(String texto) {
         if (texto == null || texto.trim().isEmpty()) return null;
         return Double.parseDouble(texto.trim().replace(",", "."));
@@ -109,34 +157,60 @@ public class PanelAlmacenController {
         return Integer.parseInt(texto.trim());
     }
 
+    // =====================================================
+    // RESET
+    // =====================================================
     private void limpiarFormulario() {
-        txtCodigo.clear();
-        txtCodigoFabricacion.clear();
-        txtNombre.clear();
+        // Identificación
+        txtNumeroBarra.clear();
+        txtNombreProducto.clear();
+        cmbTipoProducto.getSelectionModel().selectFirst();
+        txtMarcaProducto.clear();
+        cmbUnidadMedida.getSelectionModel().selectFirst();
+        txtCantidad.clear();
         txtDescripcion.clear();
+
+        // Fábrica
         txtCompania.clear();
         cmbPais.getSelectionModel().select("Venezuela");
-        txtPeso.clear();
-        cmbUnidadPeso.getSelectionModel().select(UnidadMedida.KILOGRAMO);
-        txtAltura.clear();
-        txtAnchura.clear();
-        txtGrosor.clear();
-        cmbUnidadDimension.getSelectionModel().select(UnidadMedida.CENTIMETRO);
-        txtPrecio.clear();
-        txtStockInicial.clear();
-        txtCodigo.requestFocus();
+        txtRif.clear();
+
+        // Medidas
+        cmbTipoMedida.getSelectionModel().select(UnidadMedida.KILOGRAMO);
+        txtCantidadMedida.clear();
+        txtContenido.clear();
+        cmbTipoDimension.getSelectionModel().select(UnidadMedida.CENTIMETRO);
+        txtCantidadDimension.clear();
+
+        // Precio
+        txtPrecioFactura.clear();
+
+        txtNumeroBarra.requestFocus();
     }
 
+    // =====================================================
+    // DIÁLOGOS
+    // =====================================================
     private void mostrarExito(Producto producto) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Producto Registrado");
-        alert.setHeaderText("✅ " + producto.getNombre());
+        alert.setHeaderText("✅ " + producto.getNombreProducto());
         alert.setContentText(
-            "Código: " + producto.getCodigo() + "\n" +
-            "Fabricación: " + producto.getCompaniaFabricacion() + "\n" +
+            "── Identificación ──\n" +
+            "Nº de barra: " + producto.getCodigoBarra() + "\n" +
+            "Tipo: " + producto.getTipoProducto() + "\n" +
+            "Marca: " + producto.getMarcaProducto() + "\n" +
+            "Unidad: " + producto.getUnidadMedida() + " × " + producto.getCantidad() + "\n\n" +
+            "── Fábrica ──\n" +
+            "Compañía: " + producto.getCompaniaFabricacion() + "\n" +
             "País: " + producto.getPaisOrigen() + "\n" +
-            "Precio: $" + producto.getPrecio() + "\n" +
-            "Stock: " + producto.getCantidad()
+            "RIF: " + producto.getIdentificador() + "\n\n" +
+            "── Medidas ──\n" +
+            "Medida: " + producto.getCantidadMedida() + " " + producto.getUnidadPeso() + "\n" +
+            "Contenido: " + producto.getContenido() + "\n" +
+            "Dimensión: " + producto.getCantidadDimension() + " " + producto.getUnidadDimension() + "\n\n" +
+            "── Precio ──\n" +
+            "Precio factura: $" + producto.getPrecio()
         );
         alert.showAndWait();
     }

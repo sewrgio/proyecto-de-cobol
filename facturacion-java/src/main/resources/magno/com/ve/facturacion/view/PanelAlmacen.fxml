@@ -9,203 +9,204 @@
             fx:controller="magno.com.ve.facturacion.ui.controller.PanelAlmacenController"
             styleClass="panel-root">
 
-    <!-- ═══════════════════════════════════════════════════════════
+    <!-- ============================================================
          ENCABEZADO
-         ═══════════════════════════════════════════════════════════ -->
+         ============================================================ -->
     <top>
         <VBox styleClass="panel-header">
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <VBox>
-                    <Label text="📦 Gestión de Almacén" styleClass="section-title"/>
-                    <Label text="Registre y administre productos del inventario" styleClass="section-subtitle"/>
-                </VBox>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="📋 Listar Productos" styleClass="btn-secondary"
-                        prefHeight="38" onAction="#handleListarProductos"/>
-                <Button text="🔄 Sincronizar con COBOL" styleClass="btn-secondary"
-                        prefHeight="38" onAction="#handleSincronizar"/>
-            </HBox>
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            <Label text="Registrar Nuevo Producto" styleClass="section-title"/>
+            <Label text="Complete los datos del producto para agregarlo al almacén"
+                   styleClass="section-subtitle"/>
         </VBox>
     </top>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         CENTRO: Formulario + Lista
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- ============================================================
+         CENTRO: FORMULARIO (scrollable)
+         ============================================================ -->
     <center>
-        <HBox spacing="12">
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
             <padding>
-                <Insets top="12" right="12" bottom="12" left="12"/>
+                <Insets top="20" right="30" bottom="20" left="30"/>
             </padding>
 
-            <!-- ═══ FORMULARIO (izquierda) ═══ -->
-            <VBox spacing="12" prefWidth="520" minWidth="480">
-                <ScrollPane fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
-                    <VBox spacing="12">
+            <VBox spacing="16">
 
-                        <!-- Identificación -->
-                        <VBox styleClass="card" spacing="10">
-                            <Label text="📋 Identificación" styleClass="card-title"/>
+                <!-- ══════════════════════════════════════════════
+                     TARJETA 1: IDENTIFICACIÓN DEL PRODUCTO
+                     ══════════════════════════════════════════════ -->
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Identificación del Producto" styleClass="card-title"/>
 
-                            <HBox spacing="10">
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Código (12 dígitos) *" styleClass="field-label"/>
-                                    <TextField fx:id="txtCodigo" promptText="Ej: 123456789012"
-                                               styleClass="text-field"/>
-                                </VBox>
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Código de fabricación *" styleClass="field-label"/>
-                                    <TextField fx:id="txtCodigoFabricacion" promptText="Ej: FAB-2024-A001"
-                                               styleClass="text-field"/>
-                                </VBox>
-                            </HBox>
-
-                            <VBox spacing="5">
-                                <Label text="Nombre del producto *" styleClass="field-label"/>
-                                <TextField fx:id="txtNombre" promptText="Ej: Laptop HP 15 pulgadas"
-                                           styleClass="text-field"/>
-                            </VBox>
-
-                            <VBox spacing="5">
-                                <Label text="Descripción" styleClass="field-label"/>
-                                <TextField fx:id="txtDescripcion" promptText="Descripción opcional"
-                                           styleClass="text-field"/>
-                            </VBox>
+                    <!-- Fila 1: Nº de barra | Nombre del producto -->
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Nº de barra *" styleClass="field-label"/>
+                            <TextField fx:id="txtNumeroBarra"
+                                       promptText="Ej: 7591234567890"
+                                       styleClass="text-field"/>
                         </VBox>
-
-                        <!-- Fabricación -->
-                        <VBox styleClass="card" spacing="10">
-                            <Label text="🏭 Fabricación" styleClass="card-title"/>
-
-                            <HBox spacing="10">
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Compañía de fabricación *" styleClass="field-label"/>
-                                    <TextField fx:id="txtCompania" promptText="Ej: Samsung Electronics Co."
-                                               styleClass="text-field"/>
-                                </VBox>
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="País de origen *" styleClass="field-label"/>
-                                    <ComboBox fx:id="cmbPais" styleClass="combo-box" maxWidth="Infinity"/>
-                                </VBox>
-                            </HBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Nombre del producto *" styleClass="field-label"/>
+                            <TextField fx:id="txtNombreProducto"
+                                       promptText="Ej: Harina P.A.N. 1kg"
+                                       styleClass="text-field"/>
                         </VBox>
+                    </HBox>
 
-                        <!-- Medidas -->
-                        <VBox styleClass="card" spacing="10">
-                            <Label text="📏 Medidas" styleClass="card-title"/>
-
-                            <HBox spacing="10">
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Peso" styleClass="field-label"/>
-                                    <TextField fx:id="txtPeso" promptText="Ej: 2.5" styleClass="text-field"/>
-                                </VBox>
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Unidad peso" styleClass="field-label"/>
-                                    <ComboBox fx:id="cmbUnidadPeso" styleClass="combo-box" maxWidth="Infinity"/>
-                                </VBox>
-                            </HBox>
-
-                            <HBox spacing="10">
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Altura" styleClass="field-label"/>
-                                    <TextField fx:id="txtAltura" promptText="Ej: 35" styleClass="text-field"/>
-                                </VBox>
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Anchura" styleClass="field-label"/>
-                                    <TextField fx:id="txtAnchura" promptText="Ej: 25" styleClass="text-field"/>
-                                </VBox>
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Grosor" styleClass="field-label"/>
-                                    <TextField fx:id="txtGrosor" promptText="Ej: 2" styleClass="text-field"/>
-                                </VBox>
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Unidad" styleClass="field-label"/>
-                                    <ComboBox fx:id="cmbUnidadDimension" styleClass="combo-box" maxWidth="Infinity"/>
-                                </VBox>
-                            </HBox>
+                    <!-- Fila 2: Tipo producto | Marca -->
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Tipo de producto *" styleClass="field-label"/>
+                            <ComboBox fx:id="cmbTipoProducto"
+                                      styleClass="combo-box"
+                                      maxWidth="Infinity"/>
                         </VBox>
-
-                        <!-- Precio y Stock -->
-                        <VBox styleClass="card" spacing="10">
-                            <Label text="💰 Precio y Stock" styleClass="card-title"/>
-
-                            <HBox spacing="10">
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Precio ($) *" styleClass="field-label"/>
-                                    <TextField fx:id="txtPrecio" promptText="Ej: 1200.00" styleClass="text-field"/>
-                                </VBox>
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                    <Label text="Stock inicial *" styleClass="field-label"/>
-                                    <TextField fx:id="txtStockInicial" promptText="Ej: 50" styleClass="text-field"/>
-                                </VBox>
-                            </HBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Marca del producto" styleClass="field-label"/>
+                            <TextField fx:id="txtMarcaProducto"
+                                       promptText="Ej: P.A.N."
+                                       styleClass="text-field"/>
                         </VBox>
+                    </HBox>
 
+                    <!-- Fila 3: Unidad de medida | Cantidad | Descripción -->
+                    <HBox spacing="20">
+                        <VBox spacing="6" prefWidth="200">
+                            <Label text="Unidad de medida *" styleClass="field-label"/>
+                            <ComboBox fx:id="cmbUnidadMedida"
+                                      styleClass="combo-box"
+                                      maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="6" prefWidth="150">
+                            <Label text="Cantidad *" styleClass="field-label"/>
+                            <TextField fx:id="txtCantidad"
+                                       promptText="Ej: 12"
+                                       styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Descripción" styleClass="field-label"/>
+                            <TextField fx:id="txtDescripcion"
+                                       promptText="Descripción opcional"
+                                       styleClass="text-field"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- ══════════════════════════════════════════════
+                     TARJETA 2: FÁBRICA
+                     ══════════════════════════════════════════════ -->
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Fábrica" styleClass="card-title"/>
+
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Compañía *" styleClass="field-label"/>
+                            <TextField fx:id="txtCompania"
+                                       promptText="Ej: Alimentos Polar"
+                                       styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="País *" styleClass="field-label"/>
+                            <ComboBox fx:id="cmbPais"
+                                      styleClass="combo-box"
+                                      maxWidth="Infinity"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="6">
+                        <Label text="RIF / Identificación *" styleClass="field-label"/>
+                        <TextField fx:id="txtRif"
+                                   promptText="Ej: J-12345678-9"
+                                   styleClass="text-field"/>
                     </VBox>
-                </ScrollPane>
+                </VBox>
 
-                <!-- Botones del formulario -->
-                <HBox spacing="10">
-                    <Button text="🧹 Limpiar" styleClass="btn-secondary"
-                            HBox.hgrow="ALWAYS" maxWidth="Infinity"
-                            prefHeight="42" onAction="#handleLimpiar"/>
-                    <Button text="💾 Registrar Producto" styleClass="btn-primary"
-                            HBox.hgrow="ALWAYS" maxWidth="Infinity"
-                            prefHeight="42" onAction="#handleGuardar"/>
-                </HBox>
+                <!-- ══════════════════════════════════════════════
+                     TARJETA 3: MEDIDAS
+                     ══════════════════════════════════════════════ -->
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Medidas" styleClass="card-title"/>
+
+                    <!-- Fila 1: Tipo de medida | Cantidad | Contenido -->
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Tipo de medida *" styleClass="field-label"/>
+                            <ComboBox fx:id="cmbTipoMedida"
+                                      styleClass="combo-box"
+                                      maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Cantidad *" styleClass="field-label"/>
+                            <TextField fx:id="txtCantidadMedida"
+                                       promptText="Ej: 1"
+                                       styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Contenido *" styleClass="field-label"/>
+                            <TextField fx:id="txtContenido"
+                                       promptText="Ej: 1000"
+                                       styleClass="text-field"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Fila 2: Tipo dimensión | Cantidad medida -->
+                    <HBox spacing="20">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Tipo de dimensión *" styleClass="field-label"/>
+                            <ComboBox fx:id="cmbTipoDimension"
+                                      styleClass="combo-box"
+                                      maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Cantidad medida *" styleClass="field-label"/>
+                            <TextField fx:id="txtCantidadDimension"
+                                       promptText="Ej: 20"
+                                       styleClass="text-field"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- ══════════════════════════════════════════════
+                     TARJETA 4: PRECIO
+                     ══════════════════════════════════════════════ -->
+                <VBox styleClass="card" spacing="12">
+                    <Label text="Precio" styleClass="card-title"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="ℹ Origen: " styleClass="field-label"/>
+                        <Label text="Identificación del Producto (nombre + cantidad + unidad)"
+                               style="-fx-text-fill: #64748B; -fx-font-size: 12px;"/>
+                    </HBox>
+
+                    <VBox spacing="6">
+                        <Label text="Precio según factura física ($) *" styleClass="field-label"/>
+                        <TextField fx:id="txtPrecioFactura"
+                                   promptText="Ej: 1.50"
+                                   styleClass="text-field"/>
+                    </VBox>
+                </VBox>
+
+                <Region prefHeight="10"/>
+
             </VBox>
-
-            <!-- ═══ LISTA DE PRODUCTOS (derecha) ═══ -->
-            <VBox styleClass="card" spacing="8" HBox.hgrow="ALWAYS">
-                <padding>
-                    <Insets top="12" right="12" bottom="12" left="12"/>
-                </padding>
-
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="📋 Productos Registrados" styleClass="card-title"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="lblTotalProductos" text="0 productos" styleClass="pos-items-count"/>
-                </HBox>
-
-                <TextField fx:id="txtFiltrarProductos"
-                           promptText="🔍 Filtrar productos..."
-                           styleClass="pos-search-field"/>
-
-                <TableView fx:id="tblProductos" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="colProdCodigo" text="Código" prefWidth="120"/>
-                        <TableColumn fx:id="colProdNombre" text="Producto" prefWidth="220"/>
-                        <TableColumn fx:id="colProdPrecio" text="Precio" prefWidth="90"/>
-                        <TableColumn fx:id="colProdStock" text="Stock" prefWidth="70"/>
-                        <TableColumn fx:id="colProdCategoria" text="Categoría" prefWidth="120"/>
-                    </columns>
-                    <placeholder>
-                        <Label text="📦 No hay productos registrados"/>
-                    </placeholder>
-                </TableView>
-
-                <HBox spacing="8">
-                    <Button text="✏️ Editar" styleClass="pos-btn-secondary"
-                            HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                    <Button text="🗑️ Eliminar" styleClass="pos-btn-secondary"
-                            HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                    <Button text="🔄 Actualizar" styleClass="pos-btn-secondary"
-                            HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                </HBox>
-            </VBox>
-        </HBox>
+        </ScrollPane>
     </center>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         BARRA DE ESTADO
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- ============================================================
+         BOTONES INFERIORES
+         ============================================================ -->
     <bottom>
-        <HBox styleClass="pos-status-bar" alignment="CENTER_LEFT" spacing="10">
+        <HBox styleClass="panel-footer" alignment="CENTER_RIGHT" spacing="12">
             <padding>
-                <Insets top="4" right="15" bottom="4" left="15"/>
+                <Insets top="15" right="30" bottom="15" left="30"/>
             </padding>
-            <Label fx:id="lblMensajeEstado" text="🟢 Listo"
-                   styleClass="pos-status-message" HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblContadorProductos" text="0 productos" styleClass="pos-status-info"/>
+            <Button fx:id="btnLimpiar" text="Cancelar" styleClass="btn-secondary"
+                    prefWidth="120" prefHeight="42" onAction="#handleLimpiar"/>
+            <Button fx:id="btnGuardar" text="Registrar Producto" styleClass="btn-primary"
+                    prefWidth="180" prefHeight="42" onAction="#handleGuardar"/>
         </HBox>
     </bottom>
 </BorderPane>

@@ -1,151 +1,143 @@
 package magno.com.ve.facturacion.domain.model;
 
+import magno.com.ve.facturacion.domain.enums.ClasificacionProducto;
 import magno.com.ve.facturacion.domain.enums.UnidadMedida;
 
 public class Producto {
 
-    // ===== Identificación =====
+    // ══════════════════════════════════════════════
+    // IDENTIFICACIÓN DEL PRODUCTO
+    // ══════════════════════════════════════════════
     private Long id;
-    private String codigo;                     // Código de 12 dígitos
-    private String codigoFabricacion;          // Código del fabricante
-    private String nombre;                     // Nombre del producto
-    private String descripcion;                // Descripción opcional
+    private String codigoBarra;                 // Nº de barra
+    private String nombreProducto;              // Nombre
+    private ClasificacionProducto tipoProducto; // Tipo (enum)
+    private String marcaProducto;               // Marca
+    private String unidadMedida;                // "Unidad", "Docena", "Bulto"...
+    private int cantidad;                       // Cantidad de unidades
+    private String descripcion;                 // Descripción
 
-    // ===== Fabricación =====
-    private String companiaFabricacion;        // Nombre de la compañía (NUEVO)
-    private String paisOrigen;                 // País de origen (NUEVO)
+    // ══════════════════════════════════════════════
+    // FÁBRICA
+    // ══════════════════════════════════════════════
+    private String companiaFabricacion;         // Compañía
+    private String paisOrigen;                  // País
+    private String identificador;               // RIF / identificación
 
-    // ===== Medidas físicas =====
-    private Double peso;
-    private UnidadMedida unidadPeso;
-    private Double altura;
-    private Double anchura;
-    private Double grosor;
-    private UnidadMedida unidadDimension;
+    // ══════════════════════════════════════════════
+    // MEDIDAS
+    // ══════════════════════════════════════════════
+    private UnidadMedida unidadPeso;            // Tipo de medida (kg, g, L...)
+    private Double cantidadMedida;              // Cantidad (ej: 1)
+    private Double contenido;                   // Contenido (ej: 1000)
+    private UnidadMedida unidadDimension;       // Tipo de dimensión (cm, mm...)
+    private Double cantidadDimension;           // Cantidad de la dimensión
 
-    // ===== Precio y venta =====
-    private double precio;
-    private int cantidad;
+    // ══════════════════════════════════════════════
+    // PRECIO
+    // ══════════════════════════════════════════════
+    private double precio;                      // Precio según factura
 
+    // ══════════════════════════════════════════════
+    // CONSTRUCTORES
+    // ══════════════════════════════════════════════
     public Producto() {
         this.unidadPeso = UnidadMedida.KILOGRAMO;
         this.unidadDimension = UnidadMedida.CENTIMETRO;
     }
 
-    public Producto(String codigo, String codigoFabricacion, String nombre,
-                    String descripcion,
-                    String companiaFabricacion, String paisOrigen,
-                    Double peso, UnidadMedida unidadPeso,
-                    Double altura, Double anchura, Double grosor,
-                    UnidadMedida unidadDimension,
-                    double precio, int cantidad) {
-        this.codigo = codigo;
-        this.codigoFabricacion = codigoFabricacion;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.companiaFabricacion = companiaFabricacion;
-        this.paisOrigen = paisOrigen;
-        this.peso = peso;
-        this.unidadPeso = unidadPeso != null ? unidadPeso : UnidadMedida.KILOGRAMO;
-        this.altura = altura;
-        this.anchura = anchura;
-        this.grosor = grosor;
-        this.unidadDimension = unidadDimension != null ? unidadDimension : UnidadMedida.CENTIMETRO;
-        this.precio = precio;
-        this.cantidad = cantidad;
-    }
-
-    // ===== Getters y Setters =====
+    // ══════════════════════════════════════════════
+    // GETTERS / SETTERS — Identificación
+    // ══════════════════════════════════════════════
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public String getCodigo() { return codigo; }
-    public void setCodigo(String codigo) { this.codigo = codigo; }
+    public String getCodigoBarra() { return codigoBarra; }
+    public void setCodigoBarra(String codigoBarra) { this.codigoBarra = codigoBarra; }
 
-    public String getCodigoFabricacion() { return codigoFabricacion; }
-    public void setCodigoFabricacion(String codigoFabricacion) { this.codigoFabricacion = codigoFabricacion; }
+    public String getNombreProducto() { return nombreProducto; }
+    public void setNombreProducto(String nombreProducto) { this.nombreProducto = nombreProducto; }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public ClasificacionProducto getTipoProducto() { return tipoProducto; }
+    public void setTipoProducto(ClasificacionProducto tipoProducto) { this.tipoProducto = tipoProducto; }
+
+    public String getMarcaProducto() { return marcaProducto; }
+    public void setMarcaProducto(String marcaProducto) { this.marcaProducto = marcaProducto; }
+
+    public String getUnidadMedida() { return unidadMedida; }
+    public void setUnidadMedida(String unidadMedida) { this.unidadMedida = unidadMedida; }
+
+    public int getCantidad() { return cantidad; }
+    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
+    // ══════════════════════════════════════════════
+    // GETTERS / SETTERS — Fábrica
+    // ══════════════════════════════════════════════
     public String getCompaniaFabricacion() { return companiaFabricacion; }
     public void setCompaniaFabricacion(String companiaFabricacion) { this.companiaFabricacion = companiaFabricacion; }
 
     public String getPaisOrigen() { return paisOrigen; }
     public void setPaisOrigen(String paisOrigen) { this.paisOrigen = paisOrigen; }
 
-    public Double getPeso() { return peso; }
-    public void setPeso(Double peso) { this.peso = peso; }
+    public String getIdentificador() { return identificador; }
+    public void setIdentificador(String identificador) { this.identificador = identificador; }
 
+    // ══════════════════════════════════════════════
+    // GETTERS / SETTERS — Medidas
+    // ══════════════════════════════════════════════
     public UnidadMedida getUnidadPeso() { return unidadPeso; }
     public void setUnidadPeso(UnidadMedida unidadPeso) { this.unidadPeso = unidadPeso; }
 
-    public Double getAltura() { return altura; }
-    public void setAltura(Double altura) { this.altura = altura; }
+    public Double getCantidadMedida() { return cantidadMedida; }
+    public void setCantidadMedida(Double cantidadMedida) { this.cantidadMedida = cantidadMedida; }
 
-    public Double getAnchura() { return anchura; }
-    public void setAnchura(Double anchura) { this.anchura = anchura; }
-
-    public Double getGrosor() { return grosor; }
-    public void setGrosor(Double grosor) { this.grosor = grosor; }
+    public Double getContenido() { return contenido; }
+    public void setContenido(Double contenido) { this.contenido = contenido; }
 
     public UnidadMedida getUnidadDimension() { return unidadDimension; }
     public void setUnidadDimension(UnidadMedida unidadDimension) { this.unidadDimension = unidadDimension; }
 
+    public Double getCantidadDimension() { return cantidadDimension; }
+    public void setCantidadDimension(Double cantidadDimension) { this.cantidadDimension = cantidadDimension; }
+
+    // ══════════════════════════════════════════════
+    // GETTERS / SETTERS — Precio
+    // ══════════════════════════════════════════════
     public double getPrecio() { return precio; }
     public void setPrecio(double precio) { this.precio = precio; }
 
-    public int getCantidad() { return cantidad; }
-    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
-
-    // ===== Métodos de negocio =====
+    // ══════════════════════════════════════════════
+    // MÉTODOS DE NEGOCIO
+    // ══════════════════════════════════════════════
     public double getSubtotal() {
         return precio * cantidad;
     }
 
-    public String getDimensionesFormateadas() {
-        if (altura == null && anchura == null && grosor == null) return "—";
+    public String getMedidaFormateada() {
+        if (cantidadMedida == null && contenido == null) return "—";
         StringBuilder sb = new StringBuilder();
-        if (altura != null) sb.append(altura);
-        if (anchura != null) {
+        if (cantidadMedida != null) sb.append(cantidadMedida);
+        if (unidadPeso != null) sb.append(" ").append(unidadPeso.getSimbolo());
+        if (contenido != null) {
             if (sb.length() > 0) sb.append(" × ");
-            sb.append(anchura);
+            sb.append(contenido);
         }
-        if (grosor != null) {
-            if (sb.length() > 0) sb.append(" × ");
-            sb.append(grosor);
-        }
-        if (unidadDimension != null) sb.append(" ").append(unidadDimension.getSimbolo());
         return sb.toString();
     }
 
-    public String getPesoFormateado() {
-        if (peso == null) return "—";
-        String unidad = (unidadPeso != null) ? unidadPeso.getSimbolo() : "";
-        return peso + " " + unidad;
-    }
-
-    /**
-     * Devuelve la información de fabricación formateada.
-     */
-    public String getInfoFabricacion() {
-        StringBuilder sb = new StringBuilder();
-        if (companiaFabricacion != null && !companiaFabricacion.isEmpty()) {
-            sb.append(companiaFabricacion);
-        }
-        if (paisOrigen != null && !paisOrigen.isEmpty()) {
-            if (sb.length() > 0) sb.append(" - ");
-            sb.append(paisOrigen);
-        }
-        return sb.length() > 0 ? sb.toString() : "—";
+    public String getDimensionFormateada() {
+        if (cantidadDimension == null) return "—";
+        String unidad = (unidadDimension != null) ? unidadDimension.getSimbolo() : "";
+        return cantidadDimension + " " + unidad;
     }
 
     @Override
     public String toString() {
-        return codigo + " - " + nombre;
+        return (nombreProducto != null ? nombreProducto : "(sin nombre)")
+                + " [" + (codigoBarra != null ? codigoBarra : "sin cod") + "]";
     }
 
     @Override
@@ -153,11 +145,11 @@ public class Producto {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Producto otro = (Producto) obj;
-        return codigo != null && codigo.equals(otro.codigo);
+        return codigoBarra != null && codigoBarra.equals(otro.codigoBarra);
     }
 
     @Override
     public int hashCode() {
-        return codigo != null ? codigo.hashCode() : 0;
+        return codigoBarra != null ? codigoBarra.hashCode() : 0;
     }
 }

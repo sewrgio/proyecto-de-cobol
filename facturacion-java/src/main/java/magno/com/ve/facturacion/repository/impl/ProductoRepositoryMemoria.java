@@ -23,10 +23,10 @@ public class ProductoRepositoryMemoria implements ProductoRepository {
 
         // Verificar duplicado por código
         for (Producto p : almacen.values()) {
-            if (p.getCodigo() != null
-                && p.getCodigo().equals(producto.getCodigo())
+            if (p.getCodigoBarra() != null
+                && p.getCodigoBarra().equals(producto.getCodigoBarra())
                 && !p.getId().equals(producto.getId())) {
-                throw new IllegalStateException("Ya existe un producto con el código: " + producto.getCodigo());
+                throw new IllegalStateException("Ya existe un producto con el código: " + producto.getCodigoBarra());
             }
         }
 
@@ -58,7 +58,7 @@ public class ProductoRepositoryMemoria implements ProductoRepository {
     public Optional<Producto> buscarPorCodigo(String codigo) {
         if (codigo == null) return Optional.empty();
         return almacen.values().stream()
-            .filter(p -> codigo.equalsIgnoreCase(p.getCodigo()))
+            .filter(p -> codigo.equalsIgnoreCase(p.getCodigoBarra()))
             .findFirst();
     }
 
@@ -72,7 +72,7 @@ public class ProductoRepositoryMemoria implements ProductoRepository {
         if (texto == null || texto.trim().isEmpty()) return listarTodos();
         String busq = texto.trim().toLowerCase();
         return almacen.values().stream()
-            .filter(p -> p.getNombre() != null && p.getNombre().toLowerCase().contains(busq))
+            .filter(p -> p.getNombreProducto() != null && p.getNombreProducto().toLowerCase().contains(busq))
             .collect(Collectors.toList());
     }
 
