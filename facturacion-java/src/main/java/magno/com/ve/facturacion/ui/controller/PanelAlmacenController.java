@@ -1,225 +1,239 @@
 package magno.com.ve.facturacion.ui.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import magno.com.ve.facturacion.domain.enums.ClasificacionProducto;
-import magno.com.ve.facturacion.domain.enums.UnidadMedida;
-import magno.com.ve.facturacion.domain.model.Producto;
-import magno.com.ve.facturacion.exception.ValidacionException;
-import magno.com.ve.facturacion.service.ProductoService;
-import magno.com.ve.facturacion.util.Validaciones;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 
-public class PanelAlmacenController {
+import magno.com.ve.facturacion.domain.model.Usuario;
 
-    // ══════════════════════════════════════════════
-    // IDENTIFICACIÓN DEL PRODUCTO
-    // ══════════════════════════════════════════════
-    @FXML private TextField txtNumeroBarra;
-    @FXML private TextField txtNombreProducto;
-    @FXML private ComboBox<ClasificacionProducto> cmbTipoProducto;
-    @FXML private TextField txtMarcaProducto;
-    @FXML private ComboBox<String> cmbUnidadMedida;   // bulto, docena, unidad, etc.
-    @FXML private TextField txtCantidad;
-    @FXML private TextField txtDescripcion;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ResourceBundle;
 
-    // ══════════════════════════════════════════════
-    // FÁBRICA
-    // ══════════════════════════════════════════════
-    @FXML private TextField txtCompania;
-    @FXML private ComboBox<String> cmbPais;
-    @FXML private TextField txtRif;
+public class PanelAlmacenController implements Initializable {
 
-    // ══════════════════════════════════════════════
-    // MEDIDAS
-    // ══════════════════════════════════════════════
-    @FXML private ComboBox<UnidadMedida> cmbTipoMedida;      // kg, g, L, mL, etc.
-    @FXML private TextField txtCantidadMedida;               // ej: 1
-    @FXML private TextField txtContenido;                    // ej: 1000
-    @FXML private ComboBox<UnidadMedida> cmbTipoDimension;   // cm, mm, m, etc.
-    @FXML private TextField txtCantidadDimension;            // ej: 20
+    // ==================== HEADER ====================
+    @FXML private Label lblFecha;
+    @FXML private Label lblHora;
+    @FXML private Label lblUsuario;
+    @FXML private Label lblRolUsuario;
 
-    // ══════════════════════════════════════════════
-    // PRECIO
-    // ══════════════════════════════════════════════
-    @FXML private TextField txtPrecioFactura;
+    // ==================== KPIs ====================
+    @FXML private Label lblProdTotales;
+    @FXML private Label lblProdBajo;
+    @FXML private Label lblValorInv;
+    @FXML private Label lblMovDia;
 
-    private final ProductoService productoService = new ProductoService();
+    // ==================== BUSCADOR ====================
+    @FXML private TextField txtBuscar;
 
-    // =====================================================
-    // INICIALIZACIÓN
-    // =====================================================
-    @FXML
-    public void initialize() {
-        // Tipo de producto
-        cmbTipoProducto.setItems(FXCollections.observableArrayList(ClasificacionProducto.values()));
-        cmbTipoProducto.getSelectionModel().selectFirst();
+    // ==================== TABLA ====================
+    @FXML private TableView<Producto> tblInventario;
+    @FXML private TableColumn<Producto, String> colCodigo;
+    @FXML private TableColumn<Producto, String> colProducto;
+    @FXML private TableColumn<Producto, String> colCategoria;
+    @FXML private TableColumn<Producto, String> colStock;
+    @FXML private TableColumn<Producto, String> colMinimo;
+    @FXML private TableColumn<Producto, String> colUbicacion;
+    @FXML private TableColumn<Producto, Void>   colAcciones;
 
-        // Unidad de medida del empaque
-        cmbUnidadMedida.setItems(FXCollections.observableArrayList(
-            "Unidad", "Par", "Docena", "Media docena", "Veintena",
-            "Bulto", "Caja", "Paquete", "Saco", "Paleta"
-        ));
-        cmbUnidadMedida.getSelectionModel().selectFirst();
+    @FXML private Label lblPaginacion;
 
-        // Países
-        cmbPais.setItems(FXCollections.observableArrayList(Validaciones.getPaisesValidos()));
-        cmbPais.getSelectionModel().select("Venezuela");
+    private final ObservableList<Producto> productos = FXCollections.observableArrayList();
+    private Usuario usuarioActual;
 
-        // Tipo de medida (magnitud física: peso/volumen)
-        cmbTipoMedida.setItems(FXCollections.observableArrayList(UnidadMedida.values()));
-        cmbTipoMedida.getSelectionModel().select(UnidadMedida.KILOGRAMO);
+    // ==================== INICIALIZACIÓN ====================
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        lblFecha.setText(LocalDate.now().format(
+                DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy")));
+        lblHora.setText(LocalTime.now().format(
+                DateTimeFormatter.ofPattern("hh:mm a")));
 
-        // Tipo de dimensión (longitud)
-        cmbTipoDimension.setItems(FXCollections.observableArrayList(UnidadMedida.values()));
-        cmbTipoDimension.getSelectionModel().select(UnidadMedida.CENTIMETRO);
+        // Configurar columnas
+        colCodigo.setCellValueFactory(new PropertyValueFactory<>("codigo"));
+        colProducto.setCellValueFactory(new PropertyValueFactory<>("producto"));
+        colCategoria.setCellValueFactory(new PropertyValueFactory<>("categoria"));
+        colUbicacion.setCellValueFactory(new PropertyValueFactory<>("ubicacion"));
+
+        // Columnas con estilo especial (stock y mínimo)
+        colStock.setCellValueFactory(cd -> new SimpleStringProperty(
+                cd.getValue().getStock() + "  " + cd.getValue().getEstadoStock()));
+        colMinimo.setCellValueFactory(cd -> new SimpleStringProperty(
+                String.valueOf(cd.getValue().getMinimo())));
+
+        // Columna de acciones (botones)
+        colAcciones.setCellFactory(col -> new TableCell<>() {
+            private final Button btnEditar = new Button("✏ Editar");
+            private final Button btnAjustar = new Button("⚙ Ajustar");
+            private final HBox box = new HBox(6, btnEditar, btnAjustar);
+
+            {
+                btnEditar.setStyle("-fx-background-color: transparent; -fx-text-fill: #2563eb; -fx-cursor: hand; -fx-font-size: 11px;");
+                btnAjustar.setStyle("-fx-background-color: transparent; -fx-text-fill: #2563eb; -fx-cursor: hand; -fx-font-size: 11px;");
+                box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+                btnEditar.setOnAction(e -> {
+                    Producto p = getTableView().getItems().get(getIndex());
+                    handleEditarProducto(p);
+                });
+                btnAjustar.setOnAction(e -> {
+                    Producto p = getTableView().getItems().get(getIndex());
+                    handleAjustarStock(p);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : box);
+            }
+        });
+
+        // Datos demo
+        cargarProductosDemo();
+        tblInventario.setItems(productos);
+
+        // KPIs demo
+        lblProdTotales.setText("1,248");
+        lblProdBajo.setText("27");
+        lblValorInv.setText("$ 582,430.75");
+        lblMovDia.setText("18");
+
+        // Pie de tabla
+        lblPaginacion.setText("Mostrando 1 a " + productos.size() + " de 1,248 productos");
+
+        // Buscador en vivo
+        txtBuscar.textProperty().addListener((obs, old, val) -> filtrar(val));
     }
 
-    // =====================================================
-    // ACCIONES
-    // =====================================================
-    @FXML
-    public void handleGuardar() {
-        try {
-            Producto producto = construirProducto();
-            productoService.validar(producto);
+    // ==================== INYECCIÓN DEL USUARIO ====================
+    public void setUsuario(Usuario usuario) {
+        this.usuarioActual = usuario;
+        if (usuario == null) return;
 
-            // TODO: guardar en repository
-            mostrarExito(producto);
-            limpiarFormulario();
+        if (lblUsuario != null)    lblUsuario.setText(usuario.getNombreCompleto());
+        if (lblRolUsuario != null && usuario.getRol() != null)
+            lblRolUsuario.setText(usuario.getRol().name());
+    }
 
-        } catch (ValidacionException ex) {
-            mostrarError("Errores de Validación", ex.getMessage());
-        } catch (NumberFormatException ex) {
-            mostrarError("Error de Formato",
-                "Verifique que los campos numéricos sean válidos.");
-        } catch (Exception ex) {
-            mostrarError("Error Inesperado", ex.getMessage());
-            ex.printStackTrace();
+    public Usuario getUsuarioActual() { return usuarioActual; }
+
+    // ==================== FILTRO ====================
+    private void filtrar(String texto) {
+        if (texto == null || texto.isBlank()) {
+            tblInventario.setItems(productos);
+            return;
         }
+        String t = texto.toLowerCase();
+        ObservableList<Producto> filtrados = productos.filtered(p ->
+                p.getCodigo().toLowerCase().contains(t) ||
+                p.getProducto().toLowerCase().contains(t) ||
+                p.getCategoria().toLowerCase().contains(t));
+        tblInventario.setItems(filtrados);
     }
 
-    @FXML
-    public void handleLimpiar() {
-        limpiarFormulario();
-    }
-
-    // =====================================================
-    // MAPEO UI → MODELO
-    // =====================================================
-    private Producto construirProducto() throws NumberFormatException {
-        Producto p = new Producto();
-
-        // ── Identificación
-        p.setCodigoBarra(txtNumeroBarra.getText().trim());
-        p.setNombreProducto(txtNombreProducto.getText().trim());
-        p.setTipoProducto(cmbTipoProducto.getValue());
-        p.setMarcaProducto(txtMarcaProducto.getText().trim());
-        p.setUnidadMedida(cmbUnidadMedida.getValue());
-        p.setCantidad(parseIntObligatorio(txtCantidad.getText()));
-        p.setDescripcion(txtDescripcion.getText().trim());
-
-        // ── Fábrica
-        p.setCompaniaFabricacion(txtCompania.getText().trim());
-        p.setPaisOrigen(cmbPais.getValue());
-        p.setIdentificador(txtRif.getText().trim().toUpperCase());
-
-        // ── Medidas
-        p.setUnidadPeso(cmbTipoMedida.getValue());
-        p.setCantidadMedida(parseDouble(txtCantidadMedida.getText()));
-        p.setContenido(parseDouble(txtContenido.getText()));
-        p.setUnidadDimension(cmbTipoDimension.getValue());
-        p.setCantidadDimension(parseDouble(txtCantidadDimension.getText()));
-
-        // ── Precio
-        p.setPrecio(parseDoubleObligatorio(txtPrecioFactura.getText()));
-
-        return p;
-    }
-
-    // =====================================================
-    // CONVERSORES
-    // =====================================================
-    private Double parseDouble(String texto) {
-        if (texto == null || texto.trim().isEmpty()) return null;
-        return Double.parseDouble(texto.trim().replace(",", "."));
-    }
-
-    private double parseDoubleObligatorio(String texto) {
-        if (texto == null || texto.trim().isEmpty()) return 0;
-        return Double.parseDouble(texto.trim().replace(",", "."));
-    }
-
-    private int parseIntObligatorio(String texto) {
-        if (texto == null || texto.trim().isEmpty()) return 0;
-        return Integer.parseInt(texto.trim());
-    }
-
-    // =====================================================
-    // RESET
-    // =====================================================
-    private void limpiarFormulario() {
-        // Identificación
-        txtNumeroBarra.clear();
-        txtNombreProducto.clear();
-        cmbTipoProducto.getSelectionModel().selectFirst();
-        txtMarcaProducto.clear();
-        cmbUnidadMedida.getSelectionModel().selectFirst();
-        txtCantidad.clear();
-        txtDescripcion.clear();
-
-        // Fábrica
-        txtCompania.clear();
-        cmbPais.getSelectionModel().select("Venezuela");
-        txtRif.clear();
-
-        // Medidas
-        cmbTipoMedida.getSelectionModel().select(UnidadMedida.KILOGRAMO);
-        txtCantidadMedida.clear();
-        txtContenido.clear();
-        cmbTipoDimension.getSelectionModel().select(UnidadMedida.CENTIMETRO);
-        txtCantidadDimension.clear();
-
-        // Precio
-        txtPrecioFactura.clear();
-
-        txtNumeroBarra.requestFocus();
-    }
-
-    // =====================================================
-    // DIÁLOGOS
-    // =====================================================
-    private void mostrarExito(Producto producto) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Producto Registrado");
-        alert.setHeaderText("✅ " + producto.getNombreProducto());
-        alert.setContentText(
-            "── Identificación ──\n" +
-            "Nº de barra: " + producto.getCodigoBarra() + "\n" +
-            "Tipo: " + producto.getTipoProducto() + "\n" +
-            "Marca: " + producto.getMarcaProducto() + "\n" +
-            "Unidad: " + producto.getUnidadMedida() + " × " + producto.getCantidad() + "\n\n" +
-            "── Fábrica ──\n" +
-            "Compañía: " + producto.getCompaniaFabricacion() + "\n" +
-            "País: " + producto.getPaisOrigen() + "\n" +
-            "RIF: " + producto.getIdentificador() + "\n\n" +
-            "── Medidas ──\n" +
-            "Medida: " + producto.getCantidadMedida() + " " + producto.getUnidadPeso() + "\n" +
-            "Contenido: " + producto.getContenido() + "\n" +
-            "Dimensión: " + producto.getCantidadDimension() + " " + producto.getUnidadDimension() + "\n\n" +
-            "── Precio ──\n" +
-            "Precio factura: $" + producto.getPrecio()
+    // ==================== DATOS DEMO ====================
+    private void cargarProductosDemo() {
+        productos.addAll(
+                new Producto("PRD-00125", "🔨 Martillo profesional 20 oz",
+                        "Acero forjado, mango de fibra de vidrio",
+                        "Herramientas", 56, 10, "A01-E02-P03", "OK"),
+                new Producto("PRD-00248", "🔧 Taladro inalámbrico 20V",
+                        "Batería de litio, incluye 2 baterías",
+                        "Herramientas", 8, 12, "A02-E01-P04", "Bajo"),
+                new Producto("PRD-00333", "🎨 Pintura látex blanca 1 gal",
+                        "Interior/exterior, alta cobertura",
+                        "Pinturas", 32, 15, "B01-E03-P02", "OK"),
+                new Producto("PRD-00401", "🔩 Tornillo cabeza plana 1/4\" x 1\"",
+                        "Caja de 100 unidades",
+                        "Ferretería", 3, 20, "B02-E02-P05", "Crítico"),
+                new Producto("PRD-00517", "📏 Cinta métrica 5m",
+                        "Carcasa de goma anti-deslizante",
+                        "Medición", 15, 8, "A03-E01-P01", "OK"),
+                new Producto("PRD-00622", "🥽 Lentes de seguridad",
+                        "Antirreflejo, protección UV",
+                        "Seguridad", 5, 10, "C01-E02-P03", "Bajo")
         );
-        alert.showAndWait();
     }
 
-    private void mostrarError(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(titulo);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+    // ==================== ACCIONES ====================
+    @FXML private void handleNuevoProducto()    { mostrarInfo("Nuevo producto", "Formulario para crear un nuevo producto."); }
+    @FXML private void handleEntradaMercancia() { mostrarInfo("Entrada de mercancía", "Registrar entrada de productos al inventario."); }
+    @FXML private void handleSalida()           { mostrarInfo("Salida", "Registrar salida de productos del inventario."); }
+    @FXML private void handleAjuste()           { mostrarInfo("Ajuste de inventario", "Ajustar cantidades manualmente."); }
+    @FXML private void handleImprimir()         { mostrarInfo("Imprimir listado", "Se imprimirá el listado de productos."); }
+    @FXML private void handleLimpiarFiltros()   { txtBuscar.clear(); tblInventario.setItems(productos); }
+
+    @FXML private void handlePaginaAnterior()   { /* TODO */ }
+    @FXML private void handleIrPagina2()        { /* TODO */ }
+    @FXML private void handleIrPagina3()        { /* TODO */ }
+    @FXML private void handleIrUltimaPagina()   { /* TODO */ }
+    @FXML private void handlePaginaSiguiente()  { /* TODO */ }
+
+    private void handleEditarProducto(Producto p) {
+        mostrarInfo("Editar producto", "Editando: " + p.getProducto());
+    }
+
+    private void handleAjustarStock(Producto p) {
+        mostrarInfo("Ajustar stock", "Ajustar stock de: " + p.getProducto());
+    }
+
+    private void mostrarInfo(String titulo, String mensaje) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION, mensaje, ButtonType.OK);
+        a.setTitle(titulo);
+        a.setHeaderText(null);
+        a.showAndWait();
+    }
+
+    // ==================== DTO ====================
+    public static class Producto {
+        private final String codigo;
+        private final String producto;
+        private final String descripcion;
+        private final String categoria;
+        private final int stock;
+        private final int minimo;
+        private final String ubicacion;
+        private final String estado;
+
+        public Producto(String codigo, String producto, String descripcion,
+                        String categoria, int stock, int minimo,
+                        String ubicacion, String estado) {
+            this.codigo = codigo;
+            this.producto = producto;
+            this.descripcion = descripcion;
+            this.categoria = categoria;
+            this.stock = stock;
+            this.minimo = minimo;
+            this.ubicacion = ubicacion;
+            this.estado = estado;
+        }
+
+        public String getCodigo()      { return codigo; }
+        public String getProducto()    { return producto; }
+        public String getDescripcion() { return descripcion; }
+        public String getCategoria()   { return categoria; }
+        public int    getStock()       { return stock; }
+        public int    getMinimo()      { return minimo; }
+        public String getUbicacion()   { return ubicacion; }
+        public String getEstado()      { return estado; }
+
+        public String getEstadoStock() {
+            switch (estado) {
+                case "OK":      return "● OK";
+                case "Bajo":    return "⚠ Bajo";
+                case "Crítico": return "▲ Crítico";
+                default:        return estado;
+            }
+        }
     }
 }

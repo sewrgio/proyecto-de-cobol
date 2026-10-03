@@ -7,206 +7,189 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="magno.com.ve.facturacion.ui.controller.PanelAlmacenController"
-            styleClass="panel-root">
+            styleClass="alm-root"
+            stylesheets="@../css/magno.css">
 
-    <!-- ============================================================
-         ENCABEZADO
-         ============================================================ -->
+    <!-- ==== HEADER ==== -->
     <top>
-        <VBox styleClass="panel-header">
+        <HBox styleClass="alm-header" alignment="CENTER_LEFT" spacing="16">
             <padding>
-                <Insets top="20" right="30" bottom="20" left="30"/>
+                <Insets top="12" right="24" bottom="12" left="24"/>
             </padding>
-            <Label text="Registrar Nuevo Producto" styleClass="section-title"/>
-            <Label text="Complete los datos del producto para agregarlo al almacén"
-                   styleClass="section-subtitle"/>
-        </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="alm-logo-box">
+                <Label text="M" styleClass="alm-logo-icon"/>
+                <VBox spacing="0">
+                    <Label text="MAGNO" styleClass="alm-logo-name"/>
+                    <Label text="A L M A C É N" styleClass="alm-logo-tag"/>
+                </VBox>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="alm-header-pill">
+                <Label text="📅" styleClass="alm-header-icon"/>
+                <Label fx:id="lblFecha" text="24 de mayo de 2025" styleClass="alm-header-text"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="alm-header-pill">
+                <Label text="🕐" styleClass="alm-header-icon"/>
+                <Label fx:id="lblHora" text="10:24 AM" styleClass="alm-header-text"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="👤" styleClass="alm-avatar"/>
+                <VBox spacing="0">
+                    <Label fx:id="lblUsuario"    text="Juan Pérez" styleClass="alm-user-name"/>
+                    <Label fx:id="lblRolUsuario" text="Almacén"    styleClass="alm-user-role"/>
+                </VBox>
+            </HBox>
+        </HBox>
     </top>
 
-    <!-- ============================================================
-         CENTRO: FORMULARIO (scrollable)
-         ============================================================ -->
+    <!-- ==== CONTENIDO ==== -->
     <center>
-        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
-            <padding>
-                <Insets top="20" right="30" bottom="20" left="30"/>
-            </padding>
-
+        <ScrollPane fitToWidth="true" styleClass="alm-scroll">
             <VBox spacing="16">
+                <padding>
+                    <Insets top="20" right="24" bottom="20" left="24"/>
+                </padding>
 
-                <!-- ══════════════════════════════════════════════
-                     TARJETA 1: IDENTIFICACIÓN DEL PRODUCTO
-                     ══════════════════════════════════════════════ -->
-                <VBox styleClass="card" spacing="12">
-                    <Label text="Identificación del Producto" styleClass="card-title"/>
+                <!-- == KPI CARDS == -->
+                <GridPane hgap="16">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                    </columnConstraints>
 
-                    <!-- Fila 1: Nº de barra | Nombre del producto -->
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Nº de barra *" styleClass="field-label"/>
-                            <TextField fx:id="txtNumeroBarra"
-                                       promptText="Ej: 7591234567890"
-                                       styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Nombre del producto *" styleClass="field-label"/>
-                            <TextField fx:id="txtNombreProducto"
-                                       promptText="Ej: Harina P.A.N. 1kg"
-                                       styleClass="text-field"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- Fila 2: Tipo producto | Marca -->
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Tipo de producto *" styleClass="field-label"/>
-                            <ComboBox fx:id="cmbTipoProducto"
-                                      styleClass="combo-box"
-                                      maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Marca del producto" styleClass="field-label"/>
-                            <TextField fx:id="txtMarcaProducto"
-                                       promptText="Ej: P.A.N."
-                                       styleClass="text-field"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- Fila 3: Unidad de medida | Cantidad | Descripción -->
-                    <HBox spacing="20">
-                        <VBox spacing="6" prefWidth="200">
-                            <Label text="Unidad de medida *" styleClass="field-label"/>
-                            <ComboBox fx:id="cmbUnidadMedida"
-                                      styleClass="combo-box"
-                                      maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="6" prefWidth="150">
-                            <Label text="Cantidad *" styleClass="field-label"/>
-                            <TextField fx:id="txtCantidad"
-                                       promptText="Ej: 12"
-                                       styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Descripción" styleClass="field-label"/>
-                            <TextField fx:id="txtDescripcion"
-                                       promptText="Descripción opcional"
-                                       styleClass="text-field"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-                <!-- ══════════════════════════════════════════════
-                     TARJETA 2: FÁBRICA
-                     ══════════════════════════════════════════════ -->
-                <VBox styleClass="card" spacing="12">
-                    <Label text="Fábrica" styleClass="card-title"/>
-
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Compañía *" styleClass="field-label"/>
-                            <TextField fx:id="txtCompania"
-                                       promptText="Ej: Alimentos Polar"
-                                       styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="País *" styleClass="field-label"/>
-                            <ComboBox fx:id="cmbPais"
-                                      styleClass="combo-box"
-                                      maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-
-                    <VBox spacing="6">
-                        <Label text="RIF / Identificación *" styleClass="field-label"/>
-                        <TextField fx:id="txtRif"
-                                   promptText="Ej: J-12345678-9"
-                                   styleClass="text-field"/>
+                    <!-- Card 1 -->
+                    <VBox styleClass="alm-kpi-card" spacing="6"
+                          GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="📦" styleClass="alm-kpi-icon alm-kpi-icon-blue"/>
+                            <Label text="Productos totales" styleClass="alm-kpi-title"/>
+                        </HBox>
+                        <Label fx:id="lblProdTotales" text="1,248" styleClass="alm-kpi-value"/>
+                        <Label text="↑ 32 vs ayer" styleClass="alm-kpi-delta alm-delta-up"/>
                     </VBox>
-                </VBox>
 
-                <!-- ══════════════════════════════════════════════
-                     TARJETA 3: MEDIDAS
-                     ══════════════════════════════════════════════ -->
-                <VBox styleClass="card" spacing="12">
-                    <Label text="Medidas" styleClass="card-title"/>
-
-                    <!-- Fila 1: Tipo de medida | Cantidad | Contenido -->
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Tipo de medida *" styleClass="field-label"/>
-                            <ComboBox fx:id="cmbTipoMedida"
-                                      styleClass="combo-box"
-                                      maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Cantidad *" styleClass="field-label"/>
-                            <TextField fx:id="txtCantidadMedida"
-                                       promptText="Ej: 1"
-                                       styleClass="text-field"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Contenido *" styleClass="field-label"/>
-                            <TextField fx:id="txtContenido"
-                                       promptText="Ej: 1000"
-                                       styleClass="text-field"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- Fila 2: Tipo dimensión | Cantidad medida -->
-                    <HBox spacing="20">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Tipo de dimensión *" styleClass="field-label"/>
-                            <ComboBox fx:id="cmbTipoDimension"
-                                      styleClass="combo-box"
-                                      maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Cantidad medida *" styleClass="field-label"/>
-                            <TextField fx:id="txtCantidadDimension"
-                                       promptText="Ej: 20"
-                                       styleClass="text-field"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-                <!-- ══════════════════════════════════════════════
-                     TARJETA 4: PRECIO
-                     ══════════════════════════════════════════════ -->
-                <VBox styleClass="card" spacing="12">
-                    <Label text="Precio" styleClass="card-title"/>
-
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="ℹ Origen: " styleClass="field-label"/>
-                        <Label text="Identificación del Producto (nombre + cantidad + unidad)"
-                               style="-fx-text-fill: #64748B; -fx-font-size: 12px;"/>
-                    </HBox>
-
-                    <VBox spacing="6">
-                        <Label text="Precio según factura física ($) *" styleClass="field-label"/>
-                        <TextField fx:id="txtPrecioFactura"
-                                   promptText="Ej: 1.50"
-                                   styleClass="text-field"/>
+                    <!-- Card 2 -->
+                    <VBox styleClass="alm-kpi-card alm-kpi-card-warn" spacing="6"
+                          GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="⚠" styleClass="alm-kpi-icon alm-kpi-icon-red"/>
+                            <Label text="Productos con stock bajo" styleClass="alm-kpi-title"/>
+                        </HBox>
+                        <Label fx:id="lblProdBajo" text="27" styleClass="alm-kpi-value alm-kpi-value-red"/>
+                        <Label text="Ver detalles →" styleClass="alm-kpi-link"/>
                     </VBox>
+
+                    <!-- Card 3 -->
+                    <VBox styleClass="alm-kpi-card" spacing="6"
+                          GridPane.columnIndex="2" GridPane.rowIndex="0">
+                        <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="💲" styleClass="alm-kpi-icon alm-kpi-icon-green"/>
+                            <Label text="Valor del inventario" styleClass="alm-kpi-title"/>
+                        </HBox>
+                        <!-- SIN $ aquí: se pone desde el controlador -->
+                        <Label fx:id="lblValorInv" text="582,430.75" styleClass="alm-kpi-value"/>
+                        <Label text="+4.7% vs ayer  ▲" styleClass="alm-kpi-delta alm-delta-up"/>
+                    </VBox>
+
+                    <!-- Card 4 -->
+                    <VBox styleClass="alm-kpi-card" spacing="6"
+                          GridPane.columnIndex="3" GridPane.rowIndex="0">
+                        <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="📊" styleClass="alm-kpi-icon alm-kpi-icon-blue"/>
+                            <Label text="Movimientos del día" styleClass="alm-kpi-title"/>
+                        </HBox>
+                        <Label fx:id="lblMovDia" text="18" styleClass="alm-kpi-value"/>
+                        <Label text="+12% vs ayer  ▲" styleClass="alm-kpi-delta alm-delta-up"/>
+                    </VBox>
+                </GridPane>
+
+                <!-- == BARRA DE ACCIONES == -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="＋  Nuevo producto"
+                            styleClass="alm-btn-primary"
+                            onAction="#handleNuevoProducto"/>
+
+                    <Button text="⬇  Entrada de mercancía"
+                            styleClass="alm-btn-outline"
+                            onAction="#handleEntradaMercancia"/>
+
+                    <Button text="⬆  Salida"
+                            styleClass="alm-btn-outline"
+                            onAction="#handleSalida"/>
+
+                    <Button text="🔧  Ajuste de inventario"
+                            styleClass="alm-btn-outline"
+                            onAction="#handleAjuste"/>
+
+                    <Button text="🖨  Imprimir listado"
+                            styleClass="alm-btn-outline"
+                            onAction="#handleImprimir"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <TextField fx:id="txtBuscar"
+                               promptText="Buscar por código o producto..."
+                               styleClass="alm-buscar"
+                               prefWidth="260"/>
+
+                    <Button text="⌘ K" styleClass="alm-buscar-hint" disable="true"/>
+                </HBox>
+
+                <!-- == FILTROS == -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="⚙  Categoría     ⌄"  styleClass="alm-filtro"/>
+                    <Button text="⚠  Stock bajo      ⌄" styleClass="alm-filtro"/>
+                    <Button text="🏭  Proveedor      ⌄" styleClass="alm-filtro"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Limpiar filtros  ↻" styleClass="alm-btn-link"
+                            onAction="#handleLimpiarFiltros"/>
+                </HBox>
+
+                <!-- == TABLA INVENTARIO == -->
+                <VBox styleClass="alm-card" spacing="0">
+                    <TableView fx:id="tblInventario" prefHeight="420" styleClass="alm-table">
+                        <columns>
+                            <TableColumn fx:id="colCodigo"     text="CÓDIGO"       prefWidth="110"/>
+                            <TableColumn fx:id="colProducto"   text="PRODUCTO"     prefWidth="260"/>
+                            <TableColumn fx:id="colCategoria"  text="CATEGORÍA"    prefWidth="120"/>
+                            <TableColumn fx:id="colStock"      text="STOCK ACTUAL" prefWidth="130"/>
+                            <TableColumn fx:id="colMinimo"     text="STOCK MÍNIMO" prefWidth="120"/>
+                            <TableColumn fx:id="colUbicacion"  text="UBICACIÓN"    prefWidth="120"/>
+                            <TableColumn fx:id="colAcciones"   text="ACCIONES"     prefWidth="220"/>
+                        </columns>
+                    </TableView>
+
+                    <HBox alignment="CENTER_LEFT" spacing="12" styleClass="alm-pie">
+                        <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+
+                        <Label fx:id="lblPaginacion"
+                               text="Mostrando 1 a 6 de 1,248 productos"
+                               styleClass="alm-paginacion-texto"/>
+
+                        <Region HBox.hgrow="ALWAYS"/>
+
+                        <Button text="‹" styleClass="alm-pag-btn" onAction="#handlePaginaAnterior"/>
+                        <Button text="1" styleClass="alm-pag-btn alm-pag-btn-active"/>
+                        <Button text="2" styleClass="alm-pag-btn" onAction="#handleIrPagina2"/>
+                        <Button text="3" styleClass="alm-pag-btn" onAction="#handleIrPagina3"/>
+                        <Label text="..." styleClass="alm-pag-dots"/>
+                        <Button text="208" styleClass="alm-pag-btn" onAction="#handleIrUltimaPagina"/>
+                        <Button text="›" styleClass="alm-pag-btn" onAction="#handlePaginaSiguiente"/>
+                    </HBox>
                 </VBox>
-
-                <Region prefHeight="10"/>
-
             </VBox>
         </ScrollPane>
     </center>
-
-    <!-- ============================================================
-         BOTONES INFERIORES
-         ============================================================ -->
-    <bottom>
-        <HBox styleClass="panel-footer" alignment="CENTER_RIGHT" spacing="12">
-            <padding>
-                <Insets top="15" right="30" bottom="15" left="30"/>
-            </padding>
-            <Button fx:id="btnLimpiar" text="Cancelar" styleClass="btn-secondary"
-                    prefWidth="120" prefHeight="42" onAction="#handleLimpiar"/>
-            <Button fx:id="btnGuardar" text="Registrar Producto" styleClass="btn-primary"
-                    prefWidth="180" prefHeight="42" onAction="#handleGuardar"/>
-        </HBox>
-    </bottom>
 </BorderPane>

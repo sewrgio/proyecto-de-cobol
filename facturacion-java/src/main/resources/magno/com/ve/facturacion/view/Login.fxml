@@ -3,57 +3,73 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="magno.com.ve.facturacion.ui.controller.LoginController"
            styleClass="login-root"
-           prefWidth="500" prefHeight="620">
+           stylesheets="@../css/magno.css">
 
-    <VBox alignment="CENTER" spacing="0" styleClass="login-card" maxWidth="420" maxHeight="540">
+    <!-- Tarjeta central -->
+    <VBox alignment="CENTER" maxWidth="380" maxHeight="520" styleClass="login-card" spacing="18">
         <padding>
-            <Insets top="40" right="40" bottom="40" left="40"/>
+            <Insets top="40" right="40" bottom="35" left="40"/>
         </padding>
 
-        <Label text="MAGNO" styleClass="login-logo"/>
-        <Label text="Suite de Gestión Empresarial" styleClass="login-subtitle"/>
-        <Label text="Todos los procesos de tu empresa, en un solo lugar." styleClass="login-description"/>
+        <!-- Icono de usuario -->
+        <StackPane alignment="CENTER" styleClass="login-avatar-container">
+            <Circle radius="38" styleClass="login-avatar-circle"/>
+            <FontIcon iconLiteral="mdi2a-account" iconSize="42" styleClass="login-avatar-icon"/>
+        </StackPane>
 
-        <Region prefHeight="40"/>
-
-        <VBox spacing="8" alignment="CENTER_LEFT">
-            <Label text="Usuario" styleClass="field-label"/>
-            <TextField fx:id="txtUsuario"
-                       promptText="Ingrese su usuario"
-                       styleClass="text-field"/>
+        <!-- Título -->
+        <VBox alignment="CENTER" spacing="4">
+            <Label text="MAGNO" styleClass="login-title"/>
+            <Label text="Iniciar Sesión" styleClass="login-subtitle"/>
         </VBox>
 
-        <Region prefHeight="15"/>
+        <!-- Formulario -->
+        <VBox spacing="14" VBox.vgrow="ALWAYS">
+            <VBox spacing="6">
+                <Label text="Usuario" styleClass="login-field-label"/>
+                <TextField fx:id="txtUsuario"
+                           promptText="Ingrese su usuario"
+                           styleClass="login-input"/>
+            </VBox>
 
-        <VBox spacing="8" alignment="CENTER_LEFT">
-            <Label text="Contraseña" styleClass="field-label"/>
-            <PasswordField fx:id="txtPassword"
-                           promptText="Ingrese su contraseña"
-                           styleClass="text-field"/>
+            <VBox spacing="6">
+                <Label text="Contraseña" styleClass="login-field-label"/>
+                <PasswordField fx:id="txtPassword"
+                               promptText="••••••••"
+                               styleClass="login-input"/>
+            </VBox>
+
+            <Label fx:id="lblError"
+                   text=""
+                   styleClass="login-error-label"
+                   maxWidth="Infinity"
+                   wrapText="true"/>
         </VBox>
 
-        <Region prefHeight="10"/>
+        <!-- Botón principal -->
+        <Button text="INICIAR SESIÓN"
+                styleClass="login-btn-primary"
+                maxWidth="Infinity"
+                onAction="#handleLogin"
+                defaultButton="true"/>
 
-        <Label fx:id="lblMensaje" text="" styleClass="error-label" wrapText="true"/>
+        <!-- Botón secundario -->
+        <Button text="Salir"
+                styleClass="login-btn-secondary"
+                maxWidth="Infinity"
+                onAction="#handleCancelar"
+                cancelButton="true"/>
 
-        <Region prefHeight="25"/>
-
-        <HBox spacing="15" alignment="CENTER">
-            <Button text="Ingresar" onAction="#handleLogin"
-                    styleClass="btn-primary" defaultButton="true"
-                    prefWidth="160" prefHeight="42"/>
-            <Button text="Cancelar" onAction="#handleCancelar"
-                    styleClass="btn-secondary"
-                    prefWidth="120" prefHeight="42"/>
-        </HBox>
-
-        <Region VBox.vgrow="ALWAYS"/>
-
-        <Label text="v1.0.0" styleClass="version-label"/>
+        <Label text="v1.0.0  •  Módulo de Seguridad"
+               styleClass="login-version"
+               alignment="CENTER"
+               maxWidth="Infinity"/>
     </VBox>
 </StackPane>

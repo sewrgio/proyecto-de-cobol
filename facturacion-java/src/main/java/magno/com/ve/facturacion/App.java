@@ -1,5 +1,8 @@
 package magno.com.ve.facturacion;
 
+import atlantafx.base.theme.PrimerLight;   // Tema claro moderno
+// import atlantafx.base.theme.PrimerDark;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,7 +11,9 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import magno.com.ve.facturacion.config.AppConfig;
 import magno.com.ve.facturacion.domain.model.Usuario;
-import magno.com.ve.facturacion.ui.controller.VentanaPrincipalController;
+import magno.com.ve.facturacion.ui.controller.PanelAdminController;
+
+import java.util.Objects;
 
 public class App extends Application {
 
@@ -18,16 +23,18 @@ public class App extends Application {
     public void start(Stage stage) throws Exception {
         stagePrincipal = stage;
 
-        stagePrincipal.setTitle(AppConfig.NOMBRE_SISTEMA + " | " + AppConfig.SLOGAN);
-        stagePrincipal.setResizable(false);
+        // Tema claro moderno (AtlantaFX)
+        Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 
+        // Icono de la aplicación
         try {
             stagePrincipal.getIcons().add(
-                new Image(App.class.getResourceAsStream(
-                    "/magno/com/ve/facturacion/img/logo.png"))
+                new Image(Objects.requireNonNull(
+                    App.class.getResourceAsStream("/magno/com/ve/facturacion/img/logo.png")
+                ))
             );
         } catch (Exception e) {
-            // No hay logo, ignorar
+            System.out.println("No se pudo cargar el icono de la aplicación.");
         }
 
         cargarLogin();
@@ -41,24 +48,29 @@ public class App extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root);
 
+        // CSS personalizado
         scene.getStylesheets().add(
-            App.class.getResource("/magno/com/ve/facturacion/css/magno.css").toExternalForm()
+            Objects.requireNonNull(
+                App.class.getResource("/magno/com/ve/facturacion/css/magno.css")
+            ).toExternalForm()
         );
 
         stagePrincipal.setScene(scene);
         stagePrincipal.setTitle(AppConfig.NOMBRE_SISTEMA + " | Iniciar Sesión");
-        stagePrincipal.setResizable(false);
-        stagePrincipal.centerOnScreen();
-        stagePrincipal.sizeToScene();
+
+        // Ocupa toda la pantalla
+        stagePrincipal.setResizable(true);
+        stagePrincipal.setMaximized(true);
+        stagePrincipal.setMinWidth(900);
+        stagePrincipal.setMinHeight(600);
     }
 
     public static void cargarVentanaPrincipal(Usuario usuario) throws Exception {
         System.out.println("═══════════════════════════════════════");
         System.out.println(" APP - Cargando ventana principal");
-        System.out.println("═══════════════════════════════════════");
-        System.out.println("  Usuario recibido: " + usuario);
+        System.out.println("  Usuario: " + usuario);
         System.out.println("  Rol: " + (usuario != null && usuario.getRol() != null
-                            ? usuario.getRol().name() : "NULL"));
+                ? usuario.getRol().name() : "NULL"));
         System.out.println("═══════════════════════════════════════");
 
         FXMLLoader loader = new FXMLLoader(
@@ -66,22 +78,26 @@ public class App extends Application {
         );
         Parent root = loader.load();
 
-        VentanaPrincipalController controller = loader.getController();
-        System.out.println("  Controller obtenido: " + controller);
+        PanelAdminController controller = loader.getController();
+        if (controller != null) {
+            controller.setUsuario(usuario);
+        }
 
-        controller.setUsuario(usuario);
-
-        Scene scene = new Scene(root, 1280, 850);
+        Scene scene = new Scene(root);
         scene.getStylesheets().add(
-            App.class.getResource("/magno/com/ve/facturacion/css/magno.css").toExternalForm()
+            Objects.requireNonNull(
+                App.class.getResource("/magno/com/ve/facturacion/css/magno.css")
+            ).toExternalForm()
         );
 
         stagePrincipal.setScene(scene);
         stagePrincipal.setTitle(AppConfig.NOMBRE_SISTEMA + " | " + AppConfig.SLOGAN);
+
+        // Ventana principal maximizada
         stagePrincipal.setResizable(true);
-        stagePrincipal.setWidth(1280);
-        stagePrincipal.setHeight(850);
-        stagePrincipal.centerOnScreen();
+        stagePrincipal.setMaximized(true);
+        stagePrincipal.setMinWidth(1100);
+        stagePrincipal.setMinHeight(700);
     }
 
     public static Stage getStagePrincipal() {

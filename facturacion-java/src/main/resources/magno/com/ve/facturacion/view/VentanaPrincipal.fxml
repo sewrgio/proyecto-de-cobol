@@ -1,131 +1,251 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="magno.com.ve.facturacion.ui.controller.VentanaPrincipalController"
-            prefWidth="1400" prefHeight="900"
-            styleClass="main-root">
+            fx:controller="magno.com.ve.facturacion.ui.controller.PanelAdminController"
+            styleClass="admin-root"
+            stylesheets="@../css/magno.css">
 
-    <!-- ═══════════════════════════════════════════════════════════
-         BARRA SUPERIOR
-         ═══════════════════════════════════════════════════════════ -->
-    <top>
-        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="0">
+    <!-- ==== SIDEBAR IZQUIERDO ==== -->
+    <left>
+        <VBox styleClass="admin-sidebar" prefWidth="240" minWidth="220" spacing="4">
             <padding>
-                <Insets top="0" right="24" bottom="0" left="24"/>
+                <Insets top="20" right="12" bottom="20" left="12"/>
             </padding>
 
-            <Label text="MAGNO" styleClass="top-bar-logo"/>
-            <Label text="  │  " styleClass="top-bar-separator"/>
-            <Label fx:id="lblEmpresa" text="Empresa Demo" styleClass="top-bar-empresa"/>
+            <!-- Logo -->
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="admin-logo-box">
+                <Label text="M" styleClass="admin-logo-icon"/>
+                <VBox spacing="0">
+                    <Label text="MAGNO" styleClass="admin-logo-name"/>
+                    <Label text="A D M I N" styleClass="admin-logo-tag"/>
+                </VBox>
+            </HBox>
 
-            <Region prefWidth="30"/>
-            <TextField fx:id="txtBusquedaGlobal"
-                       promptText="🔍 Buscar productos, clientes, facturas..."
-                       styleClass="top-bar-search"
-                       prefWidth="350"/>
+            <Region prefHeight="18"/>
 
-            <Region HBox.hgrow="ALWAYS"/>
+            <!-- Navegación -->
+            <Button text="🏠   Dashboard"
+                    styleClass="admin-nav-btn admin-nav-active"
+                    maxWidth="Infinity"
+                    onAction="#handleNavDashboard"/>
+            <Button text="👥   Usuarios"
+                    styleClass="admin-nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#handleMenuUsuarios"/>
+            <Button text="📦   Productos"
+                    styleClass="admin-nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#handleMenuProductos"/>
+            <Button text="📊   Reportes"
+                    styleClass="admin-nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#handleMenuReportes"/>
+            <Button text="⚙️   Configuración"
+                    styleClass="admin-nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#handleMenuFiscal"/>
+            <Button text="🗄️   Cajas"
+                    styleClass="admin-nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#handleMenuCajas"/>
+            <Button text="📥   Inventario"
+                    styleClass="admin-nav-btn"
+                    maxWidth="Infinity"
+                    onAction="#handleMenuInventario"/>
 
-            <Label fx:id="lblUsuario" text="Usuario" styleClass="top-bar-usuario"/>
-            <Region prefWidth="12"/>
-            <Label fx:id="lblRol" text="Rol" styleClass="top-bar-rol"/>
-            <Region prefWidth="16"/>
+            <Region VBox.vgrow="ALWAYS"/>
 
-            <Button fx:id="btnCerrarSesion" text="Cerrar sesión"
-                    styleClass="btn-logout"
+            <!-- Estado del sistema -->
+            <HBox styleClass="admin-status-box" alignment="CENTER_LEFT" spacing="10">
+                <Label text="●" styleClass="admin-status-dot"/>
+                <VBox spacing="0">
+                    <Label text="Sistema POS" styleClass="admin-status-title"/>
+                    <Label text="Todo en orden" styleClass="admin-status-sub"/>
+                </VBox>
+            </HBox>
+
+            <Button text="🚪   Cerrar Sesión"
+                    styleClass="pos-btn-danger"
+                    maxWidth="Infinity"
                     onAction="#handleCerrarSesion"/>
-        </HBox>
-    </top>
+        </VBox>
+    </left>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         CENTRO: Sidebar + Contenido
-         ═══════════════════════════════════════════════════════════ -->
+    <!-- ==== CONTENIDO PRINCIPAL ==== -->
     <center>
-        <HBox spacing="0">
+        <VBox spacing="0">
 
-            <!-- ═══ SIDEBAR ═══ -->
-            <VBox styleClass="sidebar" prefWidth="220" minWidth="220">
+            <!-- == HEADER == -->
+            <HBox styleClass="admin-header" alignment="CENTER_LEFT" spacing="16">
                 <padding>
-                    <Insets top="16" right="12" bottom="16" left="12"/>
+                    <Insets top="14" right="24" bottom="14" left="24"/>
                 </padding>
 
-                <!-- Menú principal -->
-                <Label text="MENÚ PRINCIPAL" styleClass="sidebar-section"/>
+                <Region HBox.hgrow="ALWAYS"/>
 
-                <Button fx:id="btnMenuAlmacen" text="📦  Almacén"
-                        styleClass="sidebar-item" maxWidth="Infinity"
-                        onAction="#handleMenuAlmacen"/>
-                <Button fx:id="btnMenuFacturacion" text="🧾  Facturación"
-                        styleClass="sidebar-item" maxWidth="Infinity"
-                        onAction="#handleMenuFacturacion"/>
-                <Button fx:id="btnMenuClientes" text="👥  Clientes"
-                        styleClass="sidebar-item" maxWidth="Infinity"
-                        onAction="#handleMenuClientes"/>
-
-                <Region prefHeight="20"/>
-                <Label text="REPORTES" styleClass="sidebar-section"/>
-
-                <Button fx:id="btnMenuReportes" text="📊  Reportes"
-                        styleClass="sidebar-item" maxWidth="Infinity"
-                        onAction="#handleMenuReportes"/>
-                <Button fx:id="btnMenuCierreZ" text="🧾  Cierre Z"
-                        styleClass="sidebar-item" maxWidth="Infinity"/>
-
-                <Region prefHeight="20"/>
-                <Label text="SISTEMA" styleClass="sidebar-section"/>
-
-                <Button fx:id="btnMenuUsuarios" text="👤  Usuarios"
-                        styleClass="sidebar-item" maxWidth="Infinity"/>
-                <Button fx:id="btnMenuConfig" text="⚙️  Configuración"
-                        styleClass="sidebar-item" maxWidth="Infinity"/>
-
-                <Region VBox.vgrow="ALWAYS"/>
-
-                <!-- Info de versión -->
-                <Separator/>
-                <Label text="MAGNO v1.0.0" styleClass="sidebar-footer"/>
-                <Label text="© 2026 MAGNO" styleClass="sidebar-footer"/>
-            </VBox>
-
-            <!-- ═══ CONTENIDO PRINCIPAL ═══ -->
-            <VBox styleClass="main-content" HBox.hgrow="ALWAYS">
-
-                <!-- Breadcrumbs + acciones -->
-                <HBox styleClass="breadcrumb-bar" alignment="CENTER_LEFT" spacing="10">
-                    <padding>
-                        <Insets top="12" right="24" bottom="12" left="24"/>
-                    </padding>
-
-                    <Label fx:id="lblBreadcrumb" text="Inicio" styleClass="breadcrumb-current"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="lblFechaHora" text="—" styleClass="breadcrumb-info"/>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="👤" styleClass="admin-avatar"/>
+                    <VBox spacing="0">
+                        <Label fx:id="lblNombreUsuario"
+                               text="Carlos Mendoza"
+                               styleClass="admin-user-name"/>
+                        <Label fx:id="lblRolUsuario"
+                               text="✔ Administrador"
+                               styleClass="admin-user-role"/>
+                    </VBox>
                 </HBox>
 
-                <!-- Contenido dinámico -->
-                <StackPane fx:id="contenidoPrincipal" VBox.vgrow="ALWAYS">
-                    <!-- El contenido se carga dinámicamente aquí -->
-                </StackPane>
-            </VBox>
-        </HBox>
+                <Separator orientation="VERTICAL" styleClass="admin-vsep"/>
+
+                <VBox alignment="CENTER_RIGHT" spacing="0">
+                    <Label fx:id="lblFecha" text="21 de mayo de 2025" styleClass="admin-fecha"/>
+                    <Label fx:id="lblHora"  text="🕐 10:24 AM"          styleClass="admin-hora"/>
+                </VBox>
+
+                <Label text="⌄" styleClass="admin-chevron"/>
+            </HBox>
+
+            <!-- == SCROLL == -->
+            <ScrollPane fitToWidth="true" styleClass="admin-scroll" VBox.vgrow="ALWAYS">
+                <VBox spacing="16">
+                    <padding>
+                        <Insets top="20" right="24" bottom="24" left="24"/>
+                    </padding>
+
+                    <!-- Título + acciones rápidas -->
+                    <HBox alignment="CENTER_LEFT" spacing="16">
+                        <VBox spacing="2">
+                            <Label text="Dashboard" styleClass="admin-page-title"/>
+                            <Label text="Resumen general del sistema POS MAGNO" styleClass="admin-page-sub"/>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS"/>
+
+                        <VBox styleClass="admin-acciones-rapidas" spacing="6">
+                            <Label text="Acciones rápidas" styleClass="admin-ar-title"/>
+                            <HBox spacing="8">
+                                <Button text="👤  Nuevo usuario"   styleClass="admin-btn-acceso" onAction="#handleNuevoUsuario"/>
+                                <Button text="📦  Nuevo producto"  styleClass="admin-btn-acceso" onAction="#handleNuevoProducto"/>
+                                <Button text="📄  Generar reporte" styleClass="admin-btn-acceso" onAction="#handleGenerarReporte"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+
+                    <!-- == KPI CARDS == -->
+                    <GridPane hgap="16" vgap="16">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                        </columnConstraints>
+
+                        <VBox styleClass="admin-kpi-card" spacing="8"
+                              GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="💲" styleClass="admin-kpi-icon admin-kpi-icon-green"/>
+                                <Label text="Ventas del día" styleClass="admin-kpi-title"/>
+                            </HBox>
+                            <Label fx:id="lblVentasDia" text="4,250.75" styleClass="admin-kpi-value"/>
+                            <Label text="↑ 12.5% vs ayer" styleClass="admin-kpi-delta admin-delta-up"/>
+                        </VBox>
+
+                        <VBox styleClass="admin-kpi-card" spacing="8"
+                              GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="🧾" styleClass="admin-kpi-icon admin-kpi-icon-blue"/>
+                                <Label text="Ticket promedio" styleClass="admin-kpi-title"/>
+                            </HBox>
+                            <Label fx:id="lblTicketProm" text="156.80" styleClass="admin-kpi-value"/>
+                            <Label text="↑ 8.3% vs ayer" styleClass="admin-kpi-delta admin-delta-up"/>
+                        </VBox>
+
+                        <VBox styleClass="admin-kpi-card" spacing="8"
+                              GridPane.columnIndex="2" GridPane.rowIndex="0">
+                            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="📦" styleClass="admin-kpi-icon admin-kpi-icon-teal"/>
+                                <Label text="Productos vendidos" styleClass="admin-kpi-title"/>
+                            </HBox>
+                            <Label fx:id="lblProdVendidos" text="286" styleClass="admin-kpi-value"/>
+                            <Label text="↑ 15.7% vs ayer" styleClass="admin-kpi-delta admin-delta-up"/>
+                        </VBox>
+
+                        <VBox styleClass="admin-kpi-card" spacing="8"
+                              GridPane.columnIndex="3" GridPane.rowIndex="0">
+                            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="👥" styleClass="admin-kpi-icon admin-kpi-icon-blue"/>
+                                <Label text="Usuarios activos" styleClass="admin-kpi-title"/>
+                            </HBox>
+                            <Label fx:id="lblUsuariosAct" text="128" styleClass="admin-kpi-value"/>
+                            <Label text="↑ 6.2% vs ayer" styleClass="admin-kpi-delta admin-delta-up"/>
+                        </VBox>
+                    </GridPane>
+
+                    <!-- == GRÁFICO == -->
+                    <VBox styleClass="admin-card" spacing="12">
+                        <padding><Insets top="18" right="20" bottom="18" left="20"/></padding>
+
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <Label text="Ventas de la semana" styleClass="admin-card-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <ComboBox fx:id="cmbRango" styleClass="admin-combo"/>
+                            <VBox alignment="CENTER_RIGHT" spacing="0">
+                                <Label text="21 may" styleClass="admin-chart-day"/>
+                                <Label text="4,250.75" styleClass="admin-chart-val"/>
+                            </VBox>
+                        </HBox>
+
+                        <LineChart fx:id="chartVentas" prefHeight="240"
+                                   styleClass="admin-chart"
+                                   createSymbols="true"
+                                   legendVisible="false"
+                                   animated="false">
+                            <xAxis>
+                                <CategoryAxis fx:id="xAxisChart"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxisChart"/>
+                            </yAxis>
+                        </LineChart>
+                    </VBox>
+
+                    <!-- == TABLA MOVIMIENTOS == -->
+                    <VBox styleClass="admin-card" spacing="12">
+                        <padding><Insets top="18" right="20" bottom="18" left="20"/></padding>
+
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Últimos movimientos" styleClass="admin-card-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="Ver todos  →" styleClass="admin-btn-link"
+                                    onAction="#handleVerTodos"/>
+                        </HBox>
+
+                        <TableView fx:id="tblMovimientos" prefHeight="240" styleClass="admin-table">
+                            <columns>
+                                <TableColumn fx:id="colId"      text="ID"            prefWidth="140"/>
+                                <TableColumn fx:id="colFecha"   text="Fecha y hora"  prefWidth="160"/>
+                                <TableColumn fx:id="colTipo"    text="Tipo"          prefWidth="110"/>
+                                <TableColumn fx:id="colDesc"    text="Descripción"   prefWidth="240"/>
+                                <TableColumn fx:id="colUsuario" text="Usuario"       prefWidth="140"/>
+                                <TableColumn fx:id="colTotal"   text="Total"         prefWidth="110"/>
+                                <TableColumn fx:id="colEstado"  text="Estado"        prefWidth="130"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </VBox>
     </center>
-
-    <!-- ═══════════════════════════════════════════════════════════
-         BARRA DE ESTADO
-         ═══════════════════════════════════════════════════════════ -->
-    <bottom>
-        <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="0">
-            <padding>
-                <Insets top="6" right="20" bottom="6" left="20"/>
-            </padding>
-
-            <Label fx:id="lblEstado" text="Listo" styleClass="status-text"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblVersion" text="MAGNO v1.0.0" styleClass="status-text"/>
-        </HBox>
-    </bottom>
 </BorderPane>

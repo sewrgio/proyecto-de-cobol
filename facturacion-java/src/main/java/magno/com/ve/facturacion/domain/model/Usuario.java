@@ -40,11 +40,23 @@ public class Usuario {
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 
+    /**
+     * Valida si el usuario tiene uno de los roles permitidos.
+     */
     public boolean tienePermiso(Rol... rolesPermitidos) {
+        if (!activo || rol == null) return false;
         for (Rol r : rolesPermitidos) {
             if (r == this.rol) return true;
         }
         return false;
+    }
+
+    /**
+     * Valida si el usuario posee un permiso específico a través de su rol granular.
+     */
+    public boolean tienePermiso(String permiso) {
+        if (!activo || rol == null) return false;
+        return rol.tienePermiso(permiso);
     }
 
     @Override

@@ -53,7 +53,7 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- iText 7 para PDFs -->
+        <!-- iText 7 -->
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>kernel</artifactId>
@@ -69,11 +69,46 @@
             <artifactId>io</artifactId>
             <version>8.0.2</version>
         </dependency>
+
+        <!-- ====================================================== -->
+        <!-- LIBRERÍAS UI MODERNAS                                  -->
+        <!-- ====================================================== -->
+
+        <!-- AtlantaFX - Temas modernos + mejores controles -->
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-base</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <!-- Ikonli - Iconos modernos -->
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-materialdesign2-pack</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-fontawesome5-pack</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+
+        <!-- ControlsFX - Formularios, notificaciones, mejores diálogos -->
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.2.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Compilador Java 21 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -83,7 +118,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Shade Plugin: crea un JAR ejecutable con todas las dependencias -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -115,7 +149,6 @@
                 </executions>
             </plugin>
 
-            <!-- JavaFX Maven Plugin para mvn javafx:run -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
