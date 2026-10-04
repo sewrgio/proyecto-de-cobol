@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="magno.com.ve.facturacion.ui.controller.MetodoPagoDialogController"
+      spacing="12" prefWidth="520">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label fx:id="lblTitulo" text="Registrar Pago"
+           style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <HBox spacing="15" alignment="CENTER_LEFT"
+          style="-fx-background-color: #f0f9f0; -fx-padding: 12; -fx-background-radius: 8;">
+        <VBox>
+            <Label text="Total USD:" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+            <Label fx:id="lblMontoUsd" text="$ 0,00"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #28a745;"/>
+        </VBox>
+        <Separator orientation="VERTICAL"/>
+        <VBox>
+            <Label text="Total Bs.:" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+            <Label fx:id="lblMontoBs" text="Bs. 0,00"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #28a745;"/>
+        </VBox>
+    </HBox>
+
+    <Separator/>
+
+    <Label text="Método de pago:" style="-fx-font-weight: bold;"/>
+    <ComboBox fx:id="cmbMetodo" maxWidth="Infinity"/>
+
+    <TitledPane text="Datos del Cliente (opcional)" expanded="false">
+        <GridPane hgap="10" vgap="8">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+            <Label text="Cédula/RIF:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtCedula" promptText="V-12345678"
+                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Nombres:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtNombres" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Apellidos:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtApellidos" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="Teléfono:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtTelefono" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label text="Email:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtEmail" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        </GridPane>
+    </TitledPane>
+
+    <VBox fx:id="panelCamposDinamicos" spacing="8"/>
+
+    <Separator/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#onCancelar" 
+                style="-fx-padding: 8 20;"/>
+        <Button fx:id="btnConfirmar" text="✓ Confirmar Pago"
+                onAction="#onConfirmar"
+                style="-fx-background-color: #28a745; -fx-text-fill: white; 
+                       -fx-font-weight: bold; -fx-padding: 8 20;"/>
+    </HBox>
+</VBox>

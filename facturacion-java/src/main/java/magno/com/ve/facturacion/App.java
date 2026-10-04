@@ -1,18 +1,20 @@
 package magno.com.ve.facturacion;
 
-import atlantafx.base.theme.PrimerLight;   // Tema claro moderno
-// import atlantafx.base.theme.PrimerDark;
-
+import atlantafx.base.theme.PrimerLight;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import magno.com.ve.facturacion.config.AppConfig;
 import magno.com.ve.facturacion.domain.model.Usuario;
 import magno.com.ve.facturacion.ui.controller.PanelAdminController;
 
+import java.net.URL;
 import java.util.Objects;
 
 public class App extends Application {
@@ -27,42 +29,96 @@ public class App extends Application {
         Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 
         // Icono de la aplicación
-        try {
-            stagePrincipal.getIcons().add(
-                new Image(Objects.requireNonNull(
-                    App.class.getResourceAsStream("/magno/com/ve/facturacion/img/logo.png")
-                ))
-            );
-        } catch (Exception e) {
-            System.out.println("No se pudo cargar el icono de la aplicación.");
-        }
+        cargarIcono(stagePrincipal);
 
+        // Cargar pantalla de login
         cargarLogin();
+
+        // Mostrar la ventana
         stagePrincipal.show();
+
+        // ✅ CRÍTICO: aplicar pantalla completa DESPUÉS de show()
+        aplicarPantallaCompleta(stagePrincipal);
+
+        // ✅ Refuerzo: re-aplicar tras un pequeño delay por si el WM lo ignora
+        Platform.runLater(() -> aplicarPantallaCompleta(stagePrincipal));
+    }
+
+    /**
+     * ✅ Fuerza la ventana a ocupar TODA la pantalla (sin usar setMaximized(true),
+     *    que se rompe con los diálogos en Linux/GTK).
+     */
+    private static void aplicarPantallaCompleta(Stage stage) {
+        if (stage == null) return;
+        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+
+        // Desactivar maximizado nativo (para que GTK no interfiera)
+        stage.setMaximized(false);
+
+        // Ajustar al área visible de la pantalla (excluye taskbar/dock)
+        stage.setX(bounds.getMinX());
+        stage.setY(bounds.getMinY());
+        stage.setWidth(bounds.getWidth());
+        stage.setHeight(bounds.getHeight());
+    }
+
+    /**
+     * ✅ Se llama cada vez que se cambia de pantalla (login → principal).
+     *    Vuelve a aplicar pantalla completa porque el Scene cambió.
+     */
+    private static void reaplicarPantallaCompleta() {
+        Platform.runLater(() -> {
+            aplicarPantallaCompleta(stagePrincipal);
+            // Segundo intento tras un frame, por si el Scene aún no está listo
+            Platform.runLater(() -> aplicarPantallaCompleta(stagePrincipal));
+        });
+    }
+
+    private void cargarIcono(Stage stage) {
+        String[] rutas = {
+                "/magno/com/ve/facturacion/img/logo.png",
+                "/magno/com/ve/facturacion/img/logo.jpg",
+                "/img/logo.png",
+                "/logo.png"
+        };
+        for (String ruta : rutas) {
+            URL url = App.class.getResource(ruta);
+            if (url != null) {
+                try {
+                    stage.getIcons().add(new Image(url.toExternalForm()));
+                    System.out.println("✅ Icono cargado: " + ruta);
+                    return;
+                } catch (Exception e) {
+                    System.err.println("⚠️ Error cargando " + ruta + ": " + e.getMessage());
+                }
+            }
+        }
+        System.err.println("❌ No se encontró el icono. Verifica que exista:");
+        System.err.println("   src/main/resources/magno/com/ve/facturacion/img/logo.png");
     }
 
     public static void cargarLogin() throws Exception {
         FXMLLoader loader = new FXMLLoader(
-            App.class.getResource("/magno/com/ve/facturacion/view/Login.fxml")
+                App.class.getResource("/magno/com/ve/facturacion/view/Login.fxml")
         );
         Parent root = loader.load();
+
+        // ✅ NO fijamos tamaño en el Scene: dejamos que el Stage mande
         Scene scene = new Scene(root);
 
-        // CSS personalizado
         scene.getStylesheets().add(
-            Objects.requireNonNull(
-                App.class.getResource("/magno/com/ve/facturacion/css/magno.css")
-            ).toExternalForm()
+                Objects.requireNonNull(
+                        App.class.getResource("/magno/com/ve/facturacion/css/magno.css")
+                ).toExternalForm()
         );
 
         stagePrincipal.setScene(scene);
         stagePrincipal.setTitle(AppConfig.NOMBRE_SISTEMA + " | Iniciar Sesión");
-
-        // Ocupa toda la pantalla
         stagePrincipal.setResizable(true);
-        stagePrincipal.setMaximized(true);
         stagePrincipal.setMinWidth(900);
         stagePrincipal.setMinHeight(600);
+
+        reaplicarPantallaCompleta();
     }
 
     public static void cargarVentanaPrincipal(Usuario usuario) throws Exception {
@@ -74,7 +130,7 @@ public class App extends Application {
         System.out.println("═══════════════════════════════════════");
 
         FXMLLoader loader = new FXMLLoader(
-            App.class.getResource("/magno/com/ve/facturacion/view/VentanaPrincipal.fxml")
+                App.class.getResource("/magno/com/ve/facturacion/view/VentanaPrincipal.fxml")
         );
         Parent root = loader.load();
 
@@ -84,20 +140,20 @@ public class App extends Application {
         }
 
         Scene scene = new Scene(root);
+
         scene.getStylesheets().add(
-            Objects.requireNonNull(
-                App.class.getResource("/magno/com/ve/facturacion/css/magno.css")
-            ).toExternalForm()
+                Objects.requireNonNull(
+                        App.class.getResource("/magno/com/ve/facturacion/css/magno.css")
+                ).toExternalForm()
         );
 
         stagePrincipal.setScene(scene);
         stagePrincipal.setTitle(AppConfig.NOMBRE_SISTEMA + " | " + AppConfig.SLOGAN);
-
-        // Ventana principal maximizada
         stagePrincipal.setResizable(true);
-        stagePrincipal.setMaximized(true);
         stagePrincipal.setMinWidth(1100);
         stagePrincipal.setMinHeight(700);
+
+        reaplicarPantallaCompleta();
     }
 
     public static Stage getStagePrincipal() {
@@ -105,7 +161,6 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        // Iniciar el servidor TCP en un hilo de fondo
         new Thread(() -> {
             try {
                 int puerto = Integer.parseInt(System.getProperty("tcp.port", "9100"));
@@ -114,7 +169,7 @@ public class App extends Application {
                 System.err.println("Error iniciando servidor TCP: " + e.getMessage());
                 e.printStackTrace();
             }
-        }).start();
+        }, "tcp-server").start();
 
         launch(args);
     }
