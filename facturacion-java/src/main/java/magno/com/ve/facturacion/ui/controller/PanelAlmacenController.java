@@ -188,10 +188,23 @@ public class PanelAlmacenController implements Initializable {
     }
 
     private void mostrarInfo(String titulo, String mensaje) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION, mensaje, ButtonType.OK);
-        a.setTitle(titulo);
-        a.setHeaderText(null);
-        a.showAndWait();
+        try (java.net.Socket socket = new java.net.Socket("127.0.0.1", Integer.parseInt(System.getProperty("tcp.port", "9100")));
+             java.io.PrintWriter out = new java.io.PrintWriter(socket.getOutputStream(), true);
+             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(socket.getInputStream()))) {
+            
+            // Enviar petición JSON TCP genérica
+            out.println("{\"modulo\":\"ALMACEN\", \"accion\":\"" + titulo + "\", \"detalle\":\"" + mensaje + "\"}");
+            
+            String respuestaServidor = in.readLine();
+            
+            Alert a = new Alert(Alert.AlertType.INFORMATION, "Servidor TCP Respondió: \n" + respuestaServidor, ButtonType.OK);
+            a.setTitle(titulo + " - RED TCP");
+            a.setHeaderText("Operación de Almacén Sincronizada");
+            a.showAndWait();
+        } catch (Exception e) {
+            Alert a = new Alert(Alert.AlertType.ERROR, "Fallo al conectar con el servidor TCP: " + e.getMessage(), ButtonType.OK);
+            a.showAndWait();
+        }
     }
 
     // ==================== DTO ====================

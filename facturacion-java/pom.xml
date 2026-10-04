@@ -23,6 +23,13 @@
             <version>2.17.0</version>
         </dependency>
 
+        <!-- Netty TCP -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.108.Final</version>
+        </dependency>
+
         <!-- JUnit -->
         <dependency>
             <groupId>junit</groupId>

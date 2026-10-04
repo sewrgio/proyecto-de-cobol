@@ -87,7 +87,40 @@ public class PanelFacturacionController implements Initializable {
                     ButtonType.OK).showAndWait();
             return;
         }
-        // TODO: lógica real de facturación
+        
+        try {
+            // Preparar el cliente y los items usando setters
+            magno.com.ve.facturacion.domain.model.Cliente cliente = new magno.com.ve.facturacion.domain.model.Cliente();
+            cliente.setCedula("V-12345678");
+            cliente.setNombres("Cliente Mostrador");
+            
+            java.util.List<magno.com.ve.facturacion.domain.model.Producto> productos = new java.util.ArrayList<>();
+            for (ItemCarrito it : items) {
+                magno.com.ve.facturacion.domain.model.Producto p = new magno.com.ve.facturacion.domain.model.Producto();
+                p.setNombreProducto(it.getNombre());
+                p.setPrecio(it.getPrecio());
+                p.setCantidad((int) it.getCantidad());
+                productos.add(p);
+            }
+            
+            // Invocar al servicio TCP
+            magno.com.ve.facturacion.service.FacturacionService servicio = 
+                new magno.com.ve.facturacion.service.FacturacionService();
+                
+            String recibo = servicio.procesarPedido(cliente, productos);
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Factura Procesada");
+            alert.setHeaderText("Transacción Exitosa vía Servidor TCP COBOL");
+            alert.setContentText("Detalle:\n" + recibo);
+            alert.showAndWait();
+            
+            handleNuevaVenta();
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR,
+                    "Error de conexión con el Servidor COBOL: " + e.getMessage(),
+                    ButtonType.OK).showAndWait();
+        }
     }
 
     // ================== CÁLCULOS ==================

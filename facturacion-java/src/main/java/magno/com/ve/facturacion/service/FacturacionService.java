@@ -21,14 +21,16 @@ public class FacturacionService {
     private final CobolConnector cobol;
 
     public FacturacionService() {
-        // Usar el conector real si el COBOL está disponible, si no el Mock
-        CobolConnector real = new CobolConnectorFile();
+        // Conectar vía Sockets al Servidor TCP de facturación (Netty) en el puerto 9100
+        int puerto = Integer.parseInt(System.getProperty("tcp.port", "9100"));
+        CobolConnector real = new magno.com.ve.facturacion.integration.cobol.CobolConnectorSocket("127.0.0.1", puerto);
+        
         if (real.estaDisponible()) {
-            System.out.println("✅ Usando CobolConnectorFile (COBOL real)");
+            System.out.println("✅ Usando CobolConnectorSocket (Servidor TCP Netty)");
             this.cobol = real;
         } else {
-            System.out.println("⚠ COBOL no disponible, usando CobolConnectorMock");
-            this.cobol = new CobolConnectorMock();
+            System.out.println("⚠ Servidor TCP no disponible, usando CobolConnectorMock");
+            this.cobol = new magno.com.ve.facturacion.integration.cobol.CobolConnectorMock();
         }
     }
 

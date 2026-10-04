@@ -105,6 +105,17 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        // Iniciar el servidor TCP en un hilo de fondo
+        new Thread(() -> {
+            try {
+                int puerto = Integer.parseInt(System.getProperty("tcp.port", "9100"));
+                new magno.com.ve.facturacion.api.tcp.TcpServer(puerto).start();
+            } catch (Exception e) {
+                System.err.println("Error iniciando servidor TCP: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
+
         launch(args);
     }
 }
