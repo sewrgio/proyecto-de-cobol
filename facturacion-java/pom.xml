@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>magno.com.ve</groupId>
@@ -14,17 +15,30 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <!-- Versiones centralizadas -->
         <javafx.version>21.0.5</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
         <ikonli.version>12.3.1</ikonli.version>
         <slf4j.version>2.0.13</slf4j.version>
         <logback.version>1.5.6</logback.version>
+        <jackson.version>2.17.0</jackson.version>
+        <netty.version>4.1.108.Final</netty.version>
+        <itext.version>8.0.2</itext.version>
+        <atlantafx.version>2.0.1</atlantafx.version>
+        <controlsfx.version>11.2.1</controlsfx.version>
+
+        <!-- Testing -->
+        <junit.version>5.10.2</junit.version>
+        <mockito.version>5.11.0</mockito.version>
+        <assertj.version>3.25.3</assertj.version>
+        <h2.version>2.2.224</h2.version>
+        <surefire.version>3.2.5</surefire.version>
     </properties>
 
     <dependencies>
-        <!-- ====================================================== -->
-        <!-- LOGGING (silencia el warning de SLF4J)                 -->
-        <!-- ====================================================== -->
+        <!-- ============================================ -->
+        <!-- LOGGING                                       -->
+        <!-- ============================================ -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -36,37 +50,27 @@
             <version>${logback.version}</version>
         </dependency>
 
-        <!-- ====================================================== -->
-        <!-- JSON                                                   -->
-        <!-- ====================================================== -->
+        <!-- ============================================ -->
+        <!-- JSON                                          -->
+        <!-- ============================================ -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.17.0</version>
+            <version>${jackson.version}</version>
         </dependency>
 
-        <!-- ====================================================== -->
-        <!-- Netty TCP                                              -->
-        <!-- ====================================================== -->
+        <!-- ============================================ -->
+        <!-- NETTY TCP                                     -->
+        <!-- ============================================ -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.108.Final</version>
+            <version>${netty.version}</version>
         </dependency>
 
-        <!-- ====================================================== -->
-        <!-- JUnit                                                  -->
-        <!-- ====================================================== -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- ====================================================== -->
-        <!-- JavaFX                                                 -->
-        <!-- ====================================================== -->
+        <!-- ============================================ -->
+        <!-- JAVAFX                                        -->
+        <!-- ============================================ -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -88,37 +92,33 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- ====================================================== -->
-        <!-- iText 7                                                -->
-        <!-- ====================================================== -->
+        <!-- ============================================ -->
+        <!-- ITEXT 7 (PDF)                                 -->
+        <!-- ============================================ -->
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>kernel</artifactId>
-            <version>8.0.2</version>
+            <version>${itext.version}</version>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>layout</artifactId>
-            <version>8.0.2</version>
+            <version>${itext.version}</version>
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>io</artifactId>
-            <version>8.0.2</version>
+            <version>${itext.version}</version>
         </dependency>
 
-        <!-- ====================================================== -->
-        <!-- LIBRERÍAS UI MODERNAS                                  -->
-        <!-- ====================================================== -->
-
-        <!-- AtlantaFX - Temas modernos -->
+        <!-- ============================================ -->
+        <!-- UI MODERNA                                    -->
+        <!-- ============================================ -->
         <dependency>
             <groupId>io.github.mkpaz</groupId>
             <artifactId>atlantafx-base</artifactId>
-            <version>2.0.1</version>
+            <version>${atlantafx.version}</version>
         </dependency>
-
-        <!-- Ikonli - Iconos modernos -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
@@ -134,20 +134,59 @@
             <artifactId>ikonli-fontawesome5-pack</artifactId>
             <version>${ikonli.version}</version>
         </dependency>
-
-        <!-- ControlsFX - Formularios, notificaciones, mejores diálogos -->
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>11.2.1</version>
+            <version>${controlsfx.version}</version>
+        </dependency>
+
+        <!-- ============================================ -->
+        <!-- TESTING                                       -->
+        <!-- ============================================ -->
+        <!-- JUnit 5 (Jupiter) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- AssertJ: aserciones legibles -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- H2: BD en memoria para pruebas de integración -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- ====================================================== -->
-            <!-- Compilador Java 21                                     -->
-            <!-- ====================================================== -->
+            <!-- ============================================ -->
+            <!-- COMPILADOR JAVA 21                            -->
+            <!-- ============================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -158,21 +197,36 @@
                 </configuration>
             </plugin>
 
-            <!-- ====================================================== -->
-            <!-- Plugin JavaFX (para ejecutar con: mvn javafx:run)      -->
-            <!-- ====================================================== -->
+            <!-- ============================================ -->
+            <!-- SUREFIRE (JUnit 5)                            -->
+            <!-- ============================================ -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+
+            <!-- ============================================ -->
+            <!-- JAVAFX PLUGIN                                 -->
+            <!-- ============================================ -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>${javafx.plugin.version}</version>
                 <configuration>
                     <mainClass>magno.com.ve.facturacion.App</mainClass>
+                    <options>
+                        <option>-Dglass.gtk.windowClass=magno-pos</option>
+                    </options>
                 </configuration>
             </plugin>
 
-            <!-- ====================================================== -->
-            <!-- Shade: crea el fat JAR con TODO incluido              -->
-            <!-- ====================================================== -->
+            <!-- ============================================ -->
+            <!-- SHADE: fat JAR                                -->
+            <!-- ============================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -199,15 +253,10 @@
                                 </filter>
                             </filters>
                             <transformers>
-                                <!-- Main-Class del JAR -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>magno.com.ve.facturacion.App</mainClass>
                                 </transformer>
-
-                                <!-- ✅ CRÍTICO: fusiona META-INF/services (Ikonli, JavaFX, ControlsFX) -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-
-                                <!-- ✅ Fusiona archivos de propiedades de Ikonli y otros -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.handlers</resource>
                                 </transformer>

@@ -35,7 +35,6 @@
 
             <Region HBox.hgrow="ALWAYS"/>
 
-            <!-- ⬅ NUEVO: Tasa de cambio -->
             <Label fx:id="lblTasa"
                    text="Tasa: consultando..."
                    styleClass="pos-header-fecha"
@@ -50,7 +49,6 @@
 
             <Separator orientation="VERTICAL" styleClass="pos-vsep"/>
 
-            <!-- ⬅ CAMBIADO: "Cerrar Sesión" → "Cerrar Turno" -->
             <Button text="Cerrar Turno"
                     styleClass="pos-btn-danger-sm"
                     onAction="#handleCerrarSesion"/>
@@ -100,13 +98,11 @@
                        maxWidth="Infinity"
                        alignment="CENTER"/>
 
-                <!-- Total USD grande -->
                 <Label fx:id="lblTotalGrande"
                        styleClass="pos-total-grande"
                        maxWidth="Infinity"
                        alignment="CENTER"/>
 
-                <!-- ⬅ NUEVO: Total en Bs. grande (debajo del USD) -->
                 <Label fx:id="lblTotalBsGrande"
                        text=""
                        maxWidth="Infinity"
@@ -115,7 +111,6 @@
 
                 <Separator styleClass="pos-separator"/>
 
-                <!-- ⬅ MODIFICADO: Subtotal con Bs. -->
                 <HBox alignment="CENTER_LEFT">
                     <Label text="Subtotal" styleClass="pos-total-label"/>
                     <Region HBox.hgrow="ALWAYS"/>
@@ -126,7 +121,6 @@
                     </VBox>
                 </HBox>
 
-                <!-- ⬅ MODIFICADO: IVA con Bs. -->
                 <HBox alignment="CENTER_LEFT">
                     <Label text="Impuestos (16%)" styleClass="pos-total-label"/>
                     <Region HBox.hgrow="ALWAYS"/>
@@ -137,7 +131,6 @@
                     </VBox>
                 </HBox>
 
-                <!-- ⬅ MODIFICADO: Descuento con Bs. -->
                 <HBox alignment="CENTER_LEFT">
                     <Label text="Descuentos" styleClass="pos-total-label pos-total-descuento"/>
                     <Region HBox.hgrow="ALWAYS"/>
@@ -150,7 +143,6 @@
 
                 <Separator styleClass="pos-separator"/>
 
-                <!-- ⬅ MODIFICADO: Total final con Bs. -->
                 <HBox alignment="CENTER_LEFT">
                     <Label text="Total" styleClass="pos-total-final-label"/>
                     <Region HBox.hgrow="ALWAYS"/>
@@ -276,19 +268,22 @@
                 </graphic>
             </Button>
 
-            <Button styleClass="pos-accion-rapida" onAction="#handleImprimirTicket">
+            <!-- ⬅ CAMBIADO: "Imprimir ticket" → "Nota de crédito" -->
+            <Button styleClass="pos-accion-rapida" onAction="#handleNotaCredito">
                 <graphic>
                     <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Label text="🖨" styleClass="pos-accion-icon"/>
+                        <Label text="🧾" styleClass="pos-accion-icon"/>
                         <VBox alignment="CENTER_LEFT" spacing="1">
-                            <Label text="Imprimir ticket" styleClass="pos-accion-titulo"/>
-                            <Label text="Reimprimir ticket" styleClass="pos-accion-sub"/>
+                            <Label text="Nota de crédito" styleClass="pos-accion-titulo"/>
+                            <Label text="Emitir / reimprimir NC" styleClass="pos-accion-sub"/>
                         </VBox>
                     </HBox>
                 </graphic>
             </Button>
 
-            <Button styleClass="pos-accion-rapida" onAction="#handleMasOpciones">
+            <Button fx:id="btnMasOpciones"
+                    styleClass="pos-accion-rapida" 
+                    onAction="#handleMasOpciones">
                 <graphic>
                     <HBox alignment="CENTER_LEFT" spacing="10">
                         <Label text="•••" styleClass="pos-accion-icon"/>

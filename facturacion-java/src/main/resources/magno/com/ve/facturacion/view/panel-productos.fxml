@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="magno.com.ve.facturacion.ui.controller.PanelProductosController"
+      spacing="10"
+      prefWidth="780" prefHeight="580"
+      minWidth="700" minHeight="500"
+      style="-fx-padding: 15;">
+
+    <Label text="Selecciona un producto y la cantidad"
+           style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+
+    <Label text="Buscar:"/>
+    <TextField fx:id="txtBuscar" promptText="Buscar por nombre o código..."/>
+
+    <Label text="Resultados:"/>
+    <TableView fx:id="tablaProductos" VBox.vgrow="ALWAYS" prefHeight="300">
+        <columns>
+            <TableColumn fx:id="colCodigo" text="Código" prefWidth="100"/>
+            <TableColumn fx:id="colNombre" text="Nombre" prefWidth="250"/>
+            <TableColumn fx:id="colPrecio" text="Precio" prefWidth="100"/>
+            <TableColumn fx:id="colStock" text="Stock" prefWidth="80"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Cantidad:"/>
+        <Spinner fx:id="spinnerCantidad" editable="true" prefWidth="120"/>
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancelar"/>
+        <Button text="Agregar" onAction="#handleAgregar"
+                style="-fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+</VBox>

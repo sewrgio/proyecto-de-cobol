@@ -37,25 +37,21 @@ public class App extends Application {
         // Mostrar la ventana
         stagePrincipal.show();
 
-        // ✅ CRÍTICO: aplicar pantalla completa DESPUÉS de show()
+        // CRÍTICO: aplicar pantalla completa DESPUÉS de show()
         aplicarPantallaCompleta(stagePrincipal);
 
-        // ✅ Refuerzo: re-aplicar tras un pequeño delay por si el WM lo ignora
+        // Refuerzo: re-aplicar tras un pequeño delay
         Platform.runLater(() -> aplicarPantallaCompleta(stagePrincipal));
     }
 
     /**
-     * ✅ Fuerza la ventana a ocupar TODA la pantalla (sin usar setMaximized(true),
-     *    que se rompe con los diálogos en Linux/GTK).
+     * Fuerza la ventana a ocupar TODA la pantalla (sin usar setMaximized(true),
+     * que se rompe con los diálogos en Linux/GTK).
      */
     private static void aplicarPantallaCompleta(Stage stage) {
         if (stage == null) return;
         Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-
-        // Desactivar maximizado nativo (para que GTK no interfiera)
         stage.setMaximized(false);
-
-        // Ajustar al área visible de la pantalla (excluye taskbar/dock)
         stage.setX(bounds.getMinX());
         stage.setY(bounds.getMinY());
         stage.setWidth(bounds.getWidth());
@@ -63,13 +59,11 @@ public class App extends Application {
     }
 
     /**
-     * ✅ Se llama cada vez que se cambia de pantalla (login → principal).
-     *    Vuelve a aplicar pantalla completa porque el Scene cambió.
+     * Se llama cada vez que se cambia de pantalla (login → principal).
      */
     private static void reaplicarPantallaCompleta() {
         Platform.runLater(() -> {
             aplicarPantallaCompleta(stagePrincipal);
-            // Segundo intento tras un frame, por si el Scene aún no está listo
             Platform.runLater(() -> aplicarPantallaCompleta(stagePrincipal));
         });
     }
@@ -103,7 +97,6 @@ public class App extends Application {
         );
         Parent root = loader.load();
 
-        // ✅ NO fijamos tamaño en el Scene: dejamos que el Stage mande
         Scene scene = new Scene(root);
 
         scene.getStylesheets().add(
@@ -161,6 +154,11 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        // ✅ Forzar WM_CLASS en Linux para que el dock use el icono correcto
+        System.setProperty("glass.gtk.windowClass", "magno-pos");
+        System.setProperty("javafx.application.name", "magno-pos");
+
+        // Servidor TCP en hilo aparte
         new Thread(() -> {
             try {
                 int puerto = Integer.parseInt(System.getProperty("tcp.port", "9100"));

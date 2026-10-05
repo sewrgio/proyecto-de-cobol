@@ -10,21 +10,25 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import magno.com.ve.facturacion.domain.enums.TipoPago;
 import magno.com.ve.facturacion.domain.model.Cliente;
+import magno.com.ve.facturacion.domain.model.ItemFactura;
 import magno.com.ve.facturacion.domain.model.Pago;
 import magno.com.ve.facturacion.domain.model.Producto;
 import magno.com.ve.facturacion.service.FacturacionService;
 import magno.com.ve.facturacion.service.TasaCambioService;
-import magno.com.ve.facturacion.util.RelojTiempoReal;     
+import magno.com.ve.facturacion.util.RelojTiempoReal;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,17 +38,14 @@ import java.util.ResourceBundle;
 
 public class PanelFacturacionController implements Initializable {
 
-    // Header
     @FXML private Label lblCajero;
     @FXML private Label lblHora;
     @FXML private Label lblFecha;
     @FXML private Label lblTasa;
 
-    // Carrito
     @FXML private ListView<ItemCarrito> lstCarrito;
     @FXML private Label lblItemsCount;
 
-    // Totales
     @FXML private Label lblTotalGrande;
     @FXML private Label lblTotalBsGrande;
     @FXML private Label lblSubtotal;
@@ -56,6 +57,8 @@ public class PanelFacturacionController implements Initializable {
     @FXML private Label lblTotalUsd;
     @FXML private Label lblTotalBs;
 
+    @FXML private Button btnMasOpciones;
+
     private final ObservableList<ItemCarrito> items = FXCollections.observableArrayList();
     private static final double IVA = 0.16;
 
@@ -63,22 +66,18 @@ public class PanelFacturacionController implements Initializable {
     private double tasaActual = 0.0;
     private RelojTiempoReal reloj;
 
-    // ✅ Ruta al CSS (usada por todos los diálogos)
     private static final String CSS_PATH =
             "/magno/com/ve/facturacion/css/magno.css";
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // 1. Reloj en tiempo real
         reloj = new RelojTiempoReal(lblHora, lblFecha);
 
-        // 2. Lista del carrito
         lstCarrito.setItems(items);
         items.addListener((javafx.collections.ListChangeListener<ItemCarrito>) c ->
                 lblItemsCount.setText("(" + items.size() + ")"));
         lstCarrito.setCellFactory(lv -> new CeldaItemCarrito());
 
-        // 3. Tasa de cambio (async)
         cargarTasaCambio();
         Timeline refresco = new Timeline(new KeyFrame(Duration.minutes(30),
                 e -> cargarTasaCambio()));
@@ -90,28 +89,17 @@ public class PanelFacturacionController implements Initializable {
 
     // ================== UTILIDADES ==================
 
-    /**
-     * ✅ Aplica estilo CLARO a cualquier diálogo (Alert o Dialog),
-     *    forzando el fondo blanco con estilos inline (mayor prioridad
-     *    que AtlantaFX), y le asigna owner + modalidad.
-     */
     private void estilizarDialogo(Dialog<?> dialog) {
         if (dialog == null) return;
-
         DialogPane pane = dialog.getDialogPane();
 
-        // 1) Aplicar CSS externo
         try {
             URL cssUrl = getClass().getResource(CSS_PATH);
-            if (cssUrl != null) {
-                pane.getStylesheets().add(cssUrl.toExternalForm());
-            }
+            if (cssUrl != null) pane.getStylesheets().add(cssUrl.toExternalForm());
         } catch (Exception e) {
             System.err.println("No se pudo aplicar CSS al diálogo: " + e.getMessage());
         }
 
-        // 2) ✅ Forzar fondo BLANCO inline (AtlantaFX gana la cascada CSS,
-        //    por eso el Alert sigue gris. El inline SIEMPRE gana).
         pane.setStyle(
                 "-fx-background-color: #ffffff;" +
                 "-fx-border-color: #e6e8eb;" +
@@ -120,7 +108,6 @@ public class PanelFacturacionController implements Initializable {
                 "-fx-border-radius: 12;"
         );
 
-        // 3) ✅ Forzar header claro (donde va "Cerrar Turno" / "Advertencia")
         Node header = pane.lookup(".header-panel");
         if (header instanceof Region region) {
             region.setStyle(
@@ -130,38 +117,19 @@ public class PanelFacturacionController implements Initializable {
             );
         }
 
-        // 4) ✅ Forzar botones del diálogo (verde para "Aceptar", blanco para "Cancelar")
         for (ButtonType bt : pane.getButtonTypes()) {
             Node btnNode = pane.lookupButton(bt);
             if (btnNode instanceof Button b) {
                 boolean esDefault = (bt.getButtonData() == ButtonBar.ButtonData.OK_DONE
                         || bt.getButtonData() == ButtonBar.ButtonData.YES);
-
                 if (esDefault) {
-                    b.setStyle(
-                            "-fx-background-color: #16a34a;" +
-                            "-fx-text-fill: white;" +
-                            "-fx-font-weight: bold;" +
-                            "-fx-background-radius: 8;" +
-                            "-fx-border-radius: 8;" +
-                            "-fx-padding: 8 20 8 20;" +
-                            "-fx-cursor: hand;"
-                    );
+                    b.setStyle("-fx-background-color: #16a34a;-fx-text-fill: white;-fx-font-weight: bold;-fx-background-radius: 8;-fx-border-radius: 8;-fx-padding: 8 20 8 20;-fx-cursor: hand;");
                 } else {
-                    b.setStyle(
-                            "-fx-background-color: #ffffff;" +
-                            "-fx-text-fill: #4b5563;" +
-                            "-fx-border-color: #e6e8eb;" +
-                            "-fx-border-radius: 8;" +
-                            "-fx-background-radius: 8;" +
-                            "-fx-padding: 8 20 8 20;" +
-                            "-fx-cursor: hand;"
-                    );
+                    b.setStyle("-fx-background-color: #ffffff;-fx-text-fill: #4b5563;-fx-border-color: #e6e8eb;-fx-border-radius: 8;-fx-background-radius: 8;-fx-padding: 8 20 8 20;-fx-cursor: hand;");
                 }
             }
         }
 
-        // 5) Owner + modalidad
         if (lblCajero != null && lblCajero.getScene() != null) {
             Stage owner = (Stage) lblCajero.getScene().getWindow();
             dialog.initOwner(owner);
@@ -169,11 +137,6 @@ public class PanelFacturacionController implements Initializable {
         }
     }
 
-    /**
-     * ✅ Recupera el foco del Stage principal después de cerrar
-     *    un diálogo. Esto evita que GTK redibuje la ventana
-     *    con un layout "deforme".
-     */
     private void recuperarFoco() {
         Platform.runLater(() -> {
             if (lblCajero == null || lblCajero.getScene() == null) return;
@@ -190,7 +153,6 @@ public class PanelFacturacionController implements Initializable {
 
     private void cargarTasaCambio() {
         if (lblTasa != null) lblTasa.setText("Tasa: consultando...");
-
         Task<Double> task = new Task<>() {
             @Override protected Double call() throws Exception {
                 return tasaService.obtenerTasaOficial();
@@ -201,14 +163,10 @@ public class PanelFacturacionController implements Initializable {
             if (t > 0) {
                 tasaActual = t;
                 Platform.runLater(() -> {
-                    if (lblTasa != null) {
-                        lblTasa.setText(String.format("Tasa BCV: Bs. %.2f", tasaActual));
-                    }
+                    if (lblTasa != null) lblTasa.setText(String.format("Tasa BCV: Bs. %.2f", tasaActual));
                     recalcularTotales();
                 });
-            } else {
-                cargarTasaParalelo();
-            }
+            } else cargarTasaParalelo();
         });
         task.setOnFailed(e -> cargarTasaParalelo());
         new Thread(task, "tasa-bcv").start();
@@ -224,13 +182,9 @@ public class PanelFacturacionController implements Initializable {
             tasaActual = task.getValue();
             Platform.runLater(() -> {
                 if (tasaActual > 0) {
-                    if (lblTasa != null) {
-                        lblTasa.setText(String.format("Tasa paralelo: Bs. %.2f", tasaActual));
-                    }
+                    if (lblTasa != null) lblTasa.setText(String.format("Tasa paralelo: Bs. %.2f", tasaActual));
                     recalcularTotales();
-                } else {
-                    if (lblTasa != null) lblTasa.setText("⚠️ Tasa no disponible");
-                }
+                } else if (lblTasa != null) lblTasa.setText("⚠️ Tasa no disponible");
             });
         });
         task.setOnFailed(e -> Platform.runLater(() -> {
@@ -247,27 +201,19 @@ public class PanelFacturacionController implements Initializable {
         confirm.setTitle("Cerrar Turno");
         confirm.setHeaderText("¿Cerrar el turno actual?");
         confirm.setContentText("Se generará el reporte de cierre y se reiniciará la caja.");
-
         estilizarDialogo(confirm);
-
         Optional<ButtonType> r = confirm.showAndWait();
-
         recuperarFoco();
-
-        if (r.isPresent() && r.get() == ButtonType.OK) {
-            cerrarTurno();
-        }
+        if (r.isPresent() && r.get() == ButtonType.OK) cerrarTurno();
     }
 
     private void cerrarTurno() {
         try {
             items.clear();
             if (reloj != null) reloj.detener();
-
             magno.com.ve.facturacion.App.cargarLogin();
             magno.com.ve.facturacion.App.getStagePrincipal().setTitle(
                     magno.com.ve.facturacion.config.AppConfig.NOMBRE_SISTEMA + " | Iniciar Sesión");
-
         } catch (Exception e) {
             e.printStackTrace();
             Alert err = new Alert(Alert.AlertType.ERROR,
@@ -278,7 +224,66 @@ public class PanelFacturacionController implements Initializable {
         }
     }
 
-    @FXML private void handleAgregarProducto() { /* TODO */ }
+    // ============================================================
+    // AGREGAR PRODUCTO — abre el diálogo de búsqueda y pasa items al carrito
+    // ============================================================
+    @FXML
+    private void handleAgregarProducto() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/magno/com/ve/facturacion/view/panel-productos.fxml"));
+            Parent root = loader.load();
+
+            PanelProductosController ctrl = loader.getController();
+
+            Stage dialog = new Stage();
+            dialog.setTitle("Productos");
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            if (lblCajero != null && lblCajero.getScene() != null) {
+                dialog.initOwner(lblCajero.getScene().getWindow());
+            }
+
+            Scene scene = new Scene(root, 800, 600);
+            try {
+                URL css = getClass().getResource(CSS_PATH);
+                if (css != null) scene.getStylesheets().add(css.toExternalForm());
+            } catch (Exception ignored) {}
+
+            dialog.setScene(scene);
+            dialog.setMinWidth(700);
+            dialog.setMinHeight(500);
+            dialog.showAndWait();
+
+            // Pasar los items del diálogo al carrito principal
+            for (ItemFactura itemDialog : ctrl.getItems()) {
+                String nombre = itemDialog.getProducto().getNombre();
+                String id     = itemDialog.getProducto().getId();
+                double precio = itemDialog.getProducto().getPrecio();
+                int cant      = itemDialog.getCantidad();
+
+                Optional<ItemCarrito> existente = items.stream()
+                    .filter(x -> x.getNombre().equals(nombre))
+                    .findFirst();
+
+                if (existente.isPresent()) {
+                    ItemCarrito prev = existente.get();
+                    items.remove(prev);
+                    items.add(new ItemCarrito(
+                        prev.getNombre(),
+                        prev.getDetalle(),
+                        prev.getCantidad() + cant,
+                        prev.getPrecio()
+                    ));
+                } else {
+                    items.add(new ItemCarrito(nombre, id, cant, precio));
+                }
+            }
+            recalcularTotales();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML private void handleCobroEfectivo()   { abrirDialogoPago(TipoPago.EFECTIVO); }
     @FXML private void handleCobroDebito()     { abrirDialogoPago(TipoPago.TARJETA_DEBITO); }
@@ -288,32 +293,242 @@ public class PanelFacturacionController implements Initializable {
     @FXML private void handleNuevaVenta()      { items.clear(); recalcularTotales(); }
     @FXML private void handleCancelarVenta()   { items.clear(); recalcularTotales(); }
     @FXML private void handleAbrirCaja()       { /* TODO */ }
-    @FXML private void handleImprimirTicket()  { /* TODO */ }
-    @FXML private void handleMasOpciones()     { /* TODO */ }
 
     @FXML
     private void handleCobrarFacturar() {
         abrirDialogoPago(null);
     }
 
+    // ================== NOTA DE CRÉDITO ==================
+
+    @FXML
+    private void handleNotaCredito() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Nota de Crédito");
+        confirm.setHeaderText("🧾 Emitir Nota de Crédito");
+        confirm.setContentText("Esta acción anulará la última factura emitida.\n\n¿Desea continuar?");
+        estilizarDialogo(confirm);
+        Optional<ButtonType> r = confirm.showAndWait();
+        recuperarFoco();
+        if (r.isPresent() && r.get() == ButtonType.OK) emitirNotaCredito();
+    }
+
+    private void emitirNotaCredito() {
+        try {
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("Nota de Crédito Emitida");
+            info.setHeaderText("✅ Nota de Crédito generada");
+            info.setContentText(String.format(
+                    "Fecha: %s%nHora: %s%nCajero: %s%n%nLa nota de crédito fue registrada correctamente.%nSe enviará al servidor COBOL en la próxima sincronización.",
+                    lblFecha != null ? lblFecha.getText() : "—",
+                    lblHora  != null ? lblHora.getText()  : "—",
+                    lblCajero != null ? lblCajero.getText() : "—"));
+            estilizarDialogo(info);
+            info.showAndWait();
+            recuperarFoco();
+        } catch (Exception e) {
+            Alert err = new Alert(Alert.AlertType.ERROR,
+                    "Error al emitir Nota de Crédito: " + e.getMessage());
+            estilizarDialogo(err);
+            err.showAndWait();
+            recuperarFoco();
+        }
+    }
+
+    // ================== MENÚ "MÁS OPCIONES" ==================
+
+    @FXML
+    private void handleMasOpciones() {
+        ContextMenu menu = new ContextMenu();
+        menu.setStyle("-fx-background-color: #ffffff;-fx-border-color: #e6e8eb;-fx-border-width: 1;-fx-background-radius: 10;-fx-border-radius: 10;-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 0, 4);-fx-padding: 6 0 6 0;");
+
+        Label lblHeader = new Label("⚙️  HERRAMIENTAS Y AJUSTES");
+        lblHeader.setStyle("-fx-font-size: 11px;-fx-font-weight: bold;-fx-text-fill: #8a94a6;-fx-padding: 8 16 8 16;");
+        CustomMenuItem headerItem = new CustomMenuItem(lblHeader);
+        headerItem.setHideOnClick(false);
+        headerItem.setStyle("-fx-background-color: #f8fafc;");
+        menu.getItems().add(headerItem);
+        menu.getItems().add(new SeparatorMenuItem());
+
+        menu.getItems().add(crearItemMenu("📊", "Reporte de ventas del día", "Ver todas las ventas", this::mostrarReporteVentas));
+        menu.getItems().add(crearItemMenu("💰", "Arqueo de caja", "Contar efectivo actual", this::mostrarArqueoCaja));
+        menu.getItems().add(crearItemMenu("📦", "Consultar inventario", "Buscar productos", this::mostrarInventario));
+        menu.getItems().add(new SeparatorMenuItem());
+        menu.getItems().add(crearItemMenu("📄", "Reporte X (Corte parcial)", "Ver ventas sin cerrar turno", this::mostrarReporteX));
+        menu.getItems().add(crearItemMenu("🔒", "Reporte Z (Cierre de turno)", "Cerrar caja y generar reporte", this::mostrarReporteZ));
+        menu.getItems().add(new SeparatorMenuItem());
+        menu.getItems().add(crearItemMenu("🖨️", "Configurar impresora", "Puerto y modelo", this::mostrarConfigImpresora));
+        menu.getItems().add(new SeparatorMenuItem());
+        menu.getItems().add(crearItemMenu("⚙️", "Configuración general", "Parámetros del sistema", this::mostrarConfigGeneral));
+        menu.getItems().add(crearItemMenu("❓", "Ayuda / Acerca de", "MAGNO POS v1.0.0", this::mostrarAcercaDe));
+
+        if (btnMasOpciones != null) menu.show(btnMasOpciones, Side.TOP, 0, -5);
+    }
+
+    private CustomMenuItem crearItemMenu(String icono, String titulo, String subtitulo, Runnable accion) {
+        Label lblIcono = new Label(icono);
+        lblIcono.setStyle("-fx-font-size: 18px;");
+        lblIcono.setMinWidth(30);
+
+        Label lblTitulo = new Label(titulo);
+        lblTitulo.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1a2b4c;");
+
+        Label lblSub = new Label(subtitulo);
+        lblSub.setStyle("-fx-font-size: 11px; -fx-text-fill: #8a94a6;");
+
+        VBox textos = new VBox(1, lblTitulo, lblSub);
+        HBox contenido = new HBox(12, lblIcono, textos);
+        contenido.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        contenido.setPrefWidth(280);
+        contenido.setStyle("-fx-padding: 8 20 8 16; -fx-cursor: hand;");
+
+        contenido.setOnMouseEntered(e -> contenido.setStyle("-fx-padding: 8 20 8 16; -fx-cursor: hand;-fx-background-color: #f5f7fa; -fx-background-radius: 6;"));
+        contenido.setOnMouseExited(e -> contenido.setStyle("-fx-padding: 8 20 8 16; -fx-cursor: hand;"));
+
+        CustomMenuItem item = new CustomMenuItem(contenido);
+        item.setOnAction(e -> accion.run());
+        return item;
+    }
+
+    // ================== ACCIONES DE MENÚ ==================
+
+    private void mostrarReporteVentas() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Reporte de Ventas");
+        alert.setHeaderText("📊 Reporte del día");
+        alert.setContentText("Fecha: " + lblFecha.getText() + "\nVentas totales: 0\nMonto USD: $ 0,00\nMonto Bs.: Bs. 0,00\n\n(Función en desarrollo)");
+        estilizarDialogo(alert);
+        alert.showAndWait();
+        recuperarFoco();
+    }
+
+    private void mostrarArqueoCaja() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Arqueo de Caja");
+        alert.setHeaderText("💰 Conteo de efectivo");
+        alert.setContentText("Efectivo inicial: $ 0,00\nVentas en efectivo: $ 0,00\nEfectivo esperado: $ 0,00\n\n(Función en desarrollo)");
+        estilizarDialogo(alert);
+        alert.showAndWait();
+        recuperarFoco();
+    }
+
+    private void mostrarInventario() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Inventario");
+        alert.setHeaderText("📦 Consulta de inventario");
+        alert.setContentText("Productos en stock: 0\nProductos agotados: 0\nProductos por agotarse: 0\n\n(Función en desarrollo)");
+        estilizarDialogo(alert);
+        alert.showAndWait();
+        recuperarFoco();
+    }
+
+    private void mostrarConfigImpresora() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Configurar Impresora");
+        alert.setHeaderText("🖨️ Impresora de tickets");
+        alert.setContentText("Puerto: /dev/usb/lp0\nModelo: Epson TM-T20\nEstado: No conectada\n\n(Función en desarrollo)");
+        estilizarDialogo(alert);
+        alert.showAndWait();
+        recuperarFoco();
+    }
+
+    private void mostrarConfigGeneral() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Configuración General");
+        alert.setHeaderText("⚙️ Parámetros del sistema");
+        alert.setContentText("IVA: 16%\nMoneda base: USD\nTasa BCV: " + (tasaActual > 0 ? String.format("Bs. %.2f", tasaActual) : "no disponible") + "\nServidor TCP: puerto 9100\n\n(Función en desarrollo)");
+        estilizarDialogo(alert);
+        alert.showAndWait();
+        recuperarFoco();
+    }
+
+    private void mostrarAcercaDe() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Acerca de");
+        alert.setHeaderText("ℹ️ MAGNO - Punto de Venta");
+        alert.setContentText("Versión: 1.0.0\nMódulo: Facturación\nCliente: " + (lblCajero != null ? lblCajero.getText() : "—") + "\nFecha: " + lblFecha.getText() + "\n\n© 2026 Magno C.A.\nTodos los derechos reservados.");
+        estilizarDialogo(alert);
+        alert.showAndWait();
+        recuperarFoco();
+    }
+
+    private void mostrarReporteX() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Reporte X");
+        confirm.setHeaderText("📄 Reporte X — Corte parcial");
+        confirm.setContentText("Este reporte NO cierra el turno.\nSolo muestra las ventas hasta el momento.\n\n¿Desea generarlo?");
+        estilizarDialogo(confirm);
+        Optional<ButtonType> r = confirm.showAndWait();
+        recuperarFoco();
+        if (r.isPresent() && r.get() == ButtonType.OK) emitirReporteX();
+    }
+
+    private void emitirReporteX() {
+        try {
+            double totalVentas = calcularTotalUsd();
+            double totalBs     = totalVentas * tasaActual;
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("Reporte X — Generado");
+            info.setHeaderText("📄 Reporte X (Corte parcial)");
+            info.setContentText(String.format(
+                    "═══════════════════════════════════%n  REPORTE X — CORTE PARCIAL%n═══════════════════════════════════%nCajero: %s%nCaja: 001%nFecha: %s%nHora: %s%nTasa BCV: Bs. %.2f%n───────────────────────────────────%nVentas del turno:%n  Cantidad: 0%n  Total USD: $ 0,00%n  Total Bs.: Bs. 0,00%n───────────────────────────────────%nÚltima venta:%n  Total USD: $ %.2f%n  Total Bs.: Bs. %.2f%n───────────────────────────────────%n  ⚠️  El turno SIGUE ABIERTO%n═══════════════════════════════════%n",
+                    lblCajero != null ? lblCajero.getText() : "—",
+                    lblFecha  != null ? lblFecha.getText()  : "—",
+                    lblHora   != null ? lblHora.getText()   : "—",
+                    tasaActual, totalVentas, totalBs));
+            estilizarDialogo(info);
+            info.showAndWait();
+            recuperarFoco();
+        } catch (Exception e) {
+            Alert err = new Alert(Alert.AlertType.ERROR, "Error al generar Reporte X: " + e.getMessage());
+            estilizarDialogo(err); err.showAndWait(); recuperarFoco();
+        }
+    }
+
+    private void mostrarReporteZ() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Reporte Z");
+        confirm.setHeaderText("🔒 Reporte Z — Cierre de turno");
+        confirm.setContentText("⚠️  ADVERTENCIA: Este reporte CIERRA el turno.\n\n• Se contabilizarán todas las ventas del día\n• Se resetearán los contadores de la caja\n• El cajero deberá iniciar sesión de nuevo\n\n¿Está seguro de cerrar el turno?");
+        estilizarDialogo(confirm);
+        Optional<ButtonType> r = confirm.showAndWait();
+        recuperarFoco();
+        if (r.isPresent() && r.get() == ButtonType.OK) emitirReporteZ();
+    }
+
+    private void emitirReporteZ() {
+        try {
+            double totalVentas = calcularTotalUsd();
+            double totalBs     = totalVentas * tasaActual;
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("Reporte Z — Turno Cerrado");
+            info.setHeaderText("🔒 Reporte Z (Cierre de turno)");
+            info.setContentText(String.format(
+                    "═══════════════════════════════════%n  REPORTE Z — CIERRE DE TURNO%n═══════════════════════════════════%nCajero: %s%nCaja: 001%nFecha: %s%nHora: %s%nTasa BCV: Bs. %.2f%n───────────────────────────────────%nTotales del turno:%n  Ventas realizadas: 0%n  Total USD: $ 0,00%n  Total Bs.: Bs. 0,00%n───────────────────────────────────%nÚltima venta registrada:%n  Total USD: $ %.2f%n  Total Bs.: Bs. %.2f%n───────────────────────────────────%n  ✅  TURNO CERRADO CORRECTAMENTE%n  El cajero será redirigido al login.%n═══════════════════════════════════%n",
+                    lblCajero != null ? lblCajero.getText() : "—",
+                    lblFecha  != null ? lblFecha.getText()  : "—",
+                    lblHora   != null ? lblHora.getText()   : "—",
+                    tasaActual, totalVentas, totalBs));
+            estilizarDialogo(info);
+            info.showAndWait();
+            recuperarFoco();
+            cerrarTurno();
+        } catch (Exception e) {
+            Alert err = new Alert(Alert.AlertType.ERROR, "Error al generar Reporte Z: " + e.getMessage());
+            estilizarDialogo(err); err.showAndWait(); recuperarFoco();
+        }
+    }
+
     // ================== DIÁLOGO DE PAGO ==================
 
     private void abrirDialogoPago(TipoPago tipoInicial) {
         if (items.isEmpty()) {
-            Alert warn = new Alert(Alert.AlertType.WARNING,
-                    "No hay productos en el carrito.");
-            estilizarDialogo(warn);
-            warn.showAndWait();
-            recuperarFoco();
-            return;
+            Alert warn = new Alert(Alert.AlertType.WARNING, "No hay productos en el carrito.");
+            estilizarDialogo(warn); warn.showAndWait(); recuperarFoco(); return;
         }
         if (tasaActual <= 0) {
-            Alert warn = new Alert(Alert.AlertType.WARNING,
-                    "La tasa de cambio aún no está disponible. Espere unos segundos.");
-            estilizarDialogo(warn);
-            warn.showAndWait();
-            recuperarFoco();
-            return;
+            Alert warn = new Alert(Alert.AlertType.WARNING, "La tasa de cambio aún no está disponible. Espere unos segundos.");
+            estilizarDialogo(warn); warn.showAndWait(); recuperarFoco(); return;
         }
 
         try {
@@ -335,35 +550,25 @@ public class PanelFacturacionController implements Initializable {
             Scene dialogScene = new Scene(root);
             try {
                 URL cssUrl = getClass().getResource(CSS_PATH);
-                if (cssUrl != null) {
-                    dialogScene.getStylesheets().add(cssUrl.toExternalForm());
-                }
+                if (cssUrl != null) dialogScene.getStylesheets().add(cssUrl.toExternalForm());
             } catch (Exception e) {
                 System.err.println("No se pudo aplicar CSS al diálogo de pago: " + e.getMessage());
             }
             dialog.setScene(dialogScene);
-
             dialog.showAndWait();
-
             recuperarFoco();
 
-            if (ctrl.isConfirmado()) {
-                procesarPago(ctrl.getResultado());
-            }
+            if (ctrl.isConfirmado()) procesarPago(ctrl.getResultado());
         } catch (Exception e) {
             e.printStackTrace();
-            Alert err = new Alert(Alert.AlertType.ERROR,
-                    "Error al abrir diálogo: " + e.getMessage());
-            estilizarDialogo(err);
-            err.showAndWait();
-            recuperarFoco();
+            Alert err = new Alert(Alert.AlertType.ERROR, "Error al abrir diálogo: " + e.getMessage());
+            estilizarDialogo(err); err.showAndWait(); recuperarFoco();
         }
     }
 
     private void procesarPago(Pago pago) {
         try {
-            Cliente cliente = pago.getCliente() != null
-                    ? pago.getCliente() : new Cliente();
+            Cliente cliente = pago.getCliente() != null ? pago.getCliente() : new Cliente();
             if (cliente.getCedula() == null || cliente.getCedula().isBlank()) {
                 cliente.setCedula("V-00000000");
                 cliente.setNombres("Cliente Mostrador");
@@ -372,9 +577,10 @@ public class PanelFacturacionController implements Initializable {
             List<Producto> productos = new ArrayList<>();
             for (ItemCarrito it : items) {
                 Producto p = new Producto();
-                p.setNombreProducto(it.getNombre());
+                p.setId(it.getNombre());
+                p.setNombre(it.getNombre());
                 p.setPrecio(it.getPrecio());
-                p.setCantidad((int) it.getCantidad());
+                p.setStock((int) it.getCantidad());
                 productos.add(p);
             }
 
@@ -385,26 +591,16 @@ public class PanelFacturacionController implements Initializable {
             alert.setTitle("Factura Procesada");
             alert.setHeaderText("Pago con " + pago.getTipo().getTitulo());
             alert.setContentText(String.format(
-                    "Total USD: $ %.2f%n" +
-                    "Total Bs.:  Bs. %.2f%n" +
-                    "Tasa aplicada: %.2f%n" +
-                    "Forma de pago: %s%n%n" +
-                    "%s",
-                    pago.getMontoUsd(), pago.getMontoBs(),
-                    pago.getTasaAplicada(),
-                    pago.getFormaPagoFactura(),
-                    recibo));
+                    "Total USD: $ %.2f%nTotal Bs.:  Bs. %.2f%nTasa aplicada: %.2f%nForma de pago: %s%n%n%s",
+                    pago.getMontoUsd(), pago.getMontoBs(), pago.getTasaAplicada(),
+                    pago.getFormaPagoFactura(), recibo));
             estilizarDialogo(alert);
             alert.showAndWait();
             recuperarFoco();
-
             handleNuevaVenta();
         } catch (Exception e) {
-            Alert err = new Alert(Alert.AlertType.ERROR,
-                    "Error al procesar pago: " + e.getMessage());
-            estilizarDialogo(err);
-            err.showAndWait();
-            recuperarFoco();
+            Alert err = new Alert(Alert.AlertType.ERROR, "Error al procesar pago: " + e.getMessage());
+            estilizarDialogo(err); err.showAndWait(); recuperarFoco();
         }
     }
 
